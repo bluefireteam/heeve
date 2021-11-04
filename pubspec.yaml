@@ -8,12 +8,20 @@ publish_to: 'none'
 dependencies:
   flutter:
     sdk: flutter
+  flame:
+    git:
+      url: https://github.com/flame-engine/flame.git
+      path: packages/flame
+      ref: spydon.streamline-positioncomponents
 
 dev_dependencies:
-  flame: ^1.0.0-releasecandidate.16
   flame_lint: ^0.0.1
   dartdoc: ^0.42.0
 
 environment:
   sdk: ">=2.14.0 <3.0.0"
   flutter: ">=2.5.0"
+
+flutter:
+  assets:
+    - assets/images/
