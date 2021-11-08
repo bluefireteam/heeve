@@ -12,7 +12,7 @@ dependencies:
     git:
       url: https://github.com/flame-engine/flame.git
       path: packages/flame
-      ref: spydon.streamline-positioncomponents
+      ref: main
 
 dev_dependencies:
   flame_lint: ^0.0.1
