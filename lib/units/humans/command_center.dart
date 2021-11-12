@@ -1,5 +1,6 @@
 import 'package:flame/components.dart';
-import 'package:heeve/units/building.dart';
+
+import '../building.dart';
 
 class CommandCenter extends Building {
   static const int commandCenterHp = 1000;
@@ -15,6 +16,7 @@ class CommandCenter extends Building {
           priority: priority,
         );
 
+  @override
   Future<void> onLoad() async {
     await super.onLoad();
     // Sub classes should set up animation groups here

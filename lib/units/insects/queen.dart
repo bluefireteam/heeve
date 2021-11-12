@@ -18,6 +18,7 @@ class Queen extends Unit {
           priority: priority,
         );
 
+  @override
   Future<void> onLoad() async {
     await super.onLoad();
     // Sub classes should set up animation groups here
