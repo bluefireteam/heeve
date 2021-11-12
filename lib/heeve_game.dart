@@ -2,12 +2,13 @@ import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flame/input.dart';
 import 'package:flame/sprite.dart';
+import 'package:heeve/units/humans/infantry.dart';
 
 import 'map_generator.dart';
 import 'selector.dart';
 
 class HeeveGame extends FlameGame
-    with MouseMovementDetector, ScrollDetector, PanDetector, KeyboardEvents {
+    with MouseMovementDetector, ScrollDetector, PanDetector, KeyboardEvents, HasCollidables {
   late final IsometricTileMapComponent map;
   late final Selector selector;
 
@@ -16,6 +17,7 @@ class HeeveGame extends FlameGame
     await super.onLoad();
     camera.speed = 5000;
     camera.viewport = FixedResolutionViewport(Vector2(800, 600));
+    camera.zoom = 2;
 
     final tileset = SpriteSheet(
       image: await images.load('tileset.png'),
@@ -24,6 +26,9 @@ class HeeveGame extends FlameGame
     final matrix = MapGenerator.generateMap();
     add(map = IsometricTileMapComponent(tileset, matrix));
     add(selector = Selector(tileset.getSprite(3, 3)));
+
+    final infantry = Infantry(block: Block(5, 8));
+    add(infantry);
   }
 
   @override

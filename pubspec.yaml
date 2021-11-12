@@ -8,6 +8,19 @@ publish_to: 'none'
 dependencies:
   flutter:
     sdk: flutter
+  equatable: ^2.0.3
+  flame:
+    git:
+      url: https://github.com/flame-engine/flame.git
+      path: packages/flame
+      ref: main
+  flame_fire_atlas:
+    git:
+      url: https://github.com/flame-engine/flame.git
+      path: packages/flame_fire_atlas
+      ref: main
+
+dependency_overrides:
   flame:
     git:
       url: https://github.com/flame-engine/flame.git
@@ -25,3 +38,5 @@ environment:
 flutter:
   assets:
     - assets/images/
+    - assets/sprites/humans/
+    - assets/sprites/heeves/
