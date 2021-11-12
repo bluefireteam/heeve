@@ -20,11 +20,12 @@ class HeeveGame extends FlameGame
         HasCollidables {
   late final IsometricTileMapComponent map;
   late final Selector selector;
-  
+
   static const movementBoundaries = 10;
   static const cameraMovementSpeed = 150.0;
 
   Vector2? movingCamera;
+  List<Unit> selectedUnits = [];
 
   @override
   Future<void> onLoad() async {
@@ -59,14 +60,18 @@ class HeeveGame extends FlameGame
     final pos = details.eventPosition.game;
     final block = map.getBlock(pos);
 
-    final selectedUnit = children.where(
-      (child) =>
-          child is Unit && child.block.x == block.x && child.block.y == block.y,
-    );
+    final selectedUnit = children.whereType<Unit>().where(
+          (child) => child.block.x == block.x && child.block.y == block.y,
+        );
 
-    print(selectedUnit);
+    if (selectedUnit.isNotEmpty) {
+      selectedUnits.addAll(selectedUnit.toList());
+    } else {
+      selectedUnits.forEach((unit) {
+        unit.target = block;
+      });
+    }
   }
-
 
   @override
   void onMouseMove(PointerHoverInfo details) {
@@ -76,9 +81,11 @@ class HeeveGame extends FlameGame
       movingCamera = Vector2(-1, 0);
     } else if (mousePosition.y <= movementBoundaries) {
       movingCamera = Vector2(0, -1);
-    } else if (mousePosition.x >= camera.viewport.effectiveSize.x - movementBoundaries) {
+    } else if (mousePosition.x >=
+        camera.viewport.effectiveSize.x - movementBoundaries) {
       movingCamera = Vector2(1, 0);
-    } else if (mousePosition.y >= camera.viewport.effectiveSize.y - movementBoundaries) {
+    } else if (mousePosition.y >=
+        camera.viewport.effectiveSize.y - movementBoundaries) {
       movingCamera = Vector2(0, 1);
     } else {
       final pos = details.eventPosition.game;

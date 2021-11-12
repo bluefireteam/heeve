@@ -16,6 +16,7 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
   final int speed;
   
   Block block;
+  Block? target;
 
   Unit({
     required this.hp,
@@ -43,6 +44,13 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
 
   String _asset(String path) =>
       'sprites/$path';
+
+  @override
+  void update(double dt) {
+    super.update(dt);
+
+    position = gameRef.map.getBlockPosition(block);// - offset;
+  }
 
   @override
   Future<void>? onLoad() async {

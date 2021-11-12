@@ -24,11 +24,4 @@ class Infantry extends Unit {
   String get movingAsset => 'humans/foot-soldier.fa';
   @override
   String get idleAsset => 'humans/foot-soldier-idle.fa';
-
-  @override
-  void update(double dt) {
-    super.update(dt);
-
-    position = gameRef.map.getBlockPosition(block);// - offset;
-  }
 }
