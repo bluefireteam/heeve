@@ -1,23 +1,36 @@
+import 'dart:ui';
+
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flame/input.dart';
 import 'package:flame/sprite.dart';
-import 'package:heeve/units/humans/infantry.dart';
 
 import 'map_generator.dart';
 import 'selector.dart';
+import 'units/humans/infantry.dart';
+import 'units/unit.dart';
 
 class HeeveGame extends FlameGame
-    with MouseMovementDetector, ScrollDetector, PanDetector, KeyboardEvents, HasCollidables {
+    with
+        MouseMovementDetector,
+        ScrollDetector,
+        PanDetector,
+        TapDetector,
+        KeyboardEvents,
+        HasCollidables {
   late final IsometricTileMapComponent map;
   late final Selector selector;
+  
+  static const movementBoundaries = 10;
+  static const cameraMovementSpeed = 150.0;
+
+  Vector2? movingCamera;
 
   @override
   Future<void> onLoad() async {
     await super.onLoad();
     camera.speed = 5000;
     camera.viewport = FixedResolutionViewport(Vector2(800, 600));
-    camera.zoom = 2;
 
     final tileset = SpriteSheet(
       image: await images.load('tileset.png'),
@@ -32,11 +45,47 @@ class HeeveGame extends FlameGame
   }
 
   @override
-  void onMouseMove(PointerHoverInfo details) {
+  void update(double dt) {
+    super.update(dt);
+
+    if (movingCamera != null) {
+      camera.translateBy(movingCamera! * cameraMovementSpeed * dt);
+      camera.snap();
+    }
+  }
+
+  @override
+  void onTapUp(TapUpInfo details) {
     final pos = details.eventPosition.game;
     final block = map.getBlock(pos);
-    if (map.containsBlock(block)) {
-      selector.block = block;
+
+    final selectedUnit = children.where(
+      (child) =>
+          child is Unit && child.block.x == block.x && child.block.y == block.y,
+    );
+
+    print(selectedUnit);
+  }
+
+
+  @override
+  void onMouseMove(PointerHoverInfo details) {
+    final mousePosition = details.eventPosition.global;
+    movingCamera = null;
+    if (mousePosition.x <= movementBoundaries) {
+      movingCamera = Vector2(-1, 0);
+    } else if (mousePosition.y <= movementBoundaries) {
+      movingCamera = Vector2(0, -1);
+    } else if (mousePosition.x >= camera.viewport.effectiveSize.x - movementBoundaries) {
+      movingCamera = Vector2(1, 0);
+    } else if (mousePosition.y >= camera.viewport.effectiveSize.y - movementBoundaries) {
+      movingCamera = Vector2(0, 1);
+    } else {
+      final pos = details.eventPosition.game;
+      final block = map.getBlock(pos);
+      if (map.containsBlock(block)) {
+        selector.block = block;
+      }
     }
   }
 
@@ -46,11 +95,5 @@ class HeeveGame extends FlameGame
     final idx =
         zooms.indexOf(camera.zoom) - event.scrollDelta.game.y.sign.toInt();
     camera.zoom = zooms[idx % zooms.length];
-  }
-
-  @override
-  void onPanUpdate(DragUpdateInfo info) {
-    camera.translateBy(info.delta.global * -1);
-    camera.snap();
   }
 }

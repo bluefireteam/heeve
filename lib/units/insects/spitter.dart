@@ -6,17 +6,23 @@ class Spitter extends Unit {
   static const int spitterHp = 25;
   static const int spitterSpeed = 25;
 
-  Spitter(
-    Vector2? position,
+  Spitter({
+    required Block block,
     Vector2? size,
     int? priority,
-  ) : super(
+  }) : super(
           hp: spitterHp,
           speed: spitterSpeed,
-          position: position,
           size: size,
           priority: priority,
+                    block: block,
+
         );
+
+  @override
+  String get movingAsset => '';
+  @override
+  String get idleAsset => '';
 
   @override
   Future<void> onLoad() async {

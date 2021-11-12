@@ -1,5 +1,6 @@
 import 'package:flame/components.dart';
 import 'package:heeve/units/unit_animation_state.dart';
+import 'package:flame_fire_atlas/flame_fire_atlas.dart';
 
 import '../heeve_game.dart';
 
@@ -9,25 +10,70 @@ import '../heeve_game.dart';
 /// trees could be a [Unit].
 ///
 /// All positions are anchored in the center.
-class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
+abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
     with HasHitboxes, Collidable, HasGameRef<HeeveGame> {
   final int hp;
   final int speed;
+  
+  Block block;
 
   Unit({
     required this.hp,
     required this.speed,
+    required this.block,
     Vector2? position,
     Vector2? size,
     int? priority,
   }) : super(
           current: const UnitAnimationState(
             animation: AnimationState.idle,
-            direction: DirectionState.up,
+            direction: DirectionState.upLeft,
           ),
           position: position,
           size: size,
           anchor: Anchor.center,
           priority: priority,
         );
+
+  String get movingAsset;
+  String get idleAsset;
+
+  String _formatDirectionState(DirectionState state) =>
+      state.toString().split('.')[1];
+
+  String _asset(String path) =>
+      'sprites/$path';
+
+  @override
+  Future<void>? onLoad() async {
+    await super.onLoad();
+
+    animations = {};
+
+    final idleAtlas = await gameRef.loadFireAtlas(
+        _asset(idleAsset),
+    );
+
+    DirectionState.values.forEach((directionState) {
+      animations![
+        UnitAnimationState(
+            animation: AnimationState.idle,
+            direction: directionState,
+        )
+      ] = idleAtlas.getAnimation(_formatDirectionState(directionState));
+    });
+
+    final movingAtlas = await gameRef.loadFireAtlas(
+        _asset(movingAsset),
+    );
+
+    DirectionState.values.forEach((directionState) {
+      animations![
+        UnitAnimationState(
+            animation: AnimationState.moving,
+            direction: directionState,
+        )
+      ] = movingAtlas.getAnimation(_formatDirectionState(directionState));
+    });
+  }
 }

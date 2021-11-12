@@ -5,16 +5,21 @@ import '../building.dart';
 class CommandCenter extends Building {
   static const int commandCenterHp = 1000;
 
-  CommandCenter(
-    Vector2? position,
+  CommandCenter({
+      required Block block,
     Vector2? size,
     int? priority,
-  ) : super(
+  }) : super(
           hp: commandCenterHp,
-          position: position,
           size: size,
           priority: priority,
+          block: block,
         );
+
+  @override
+  String get movingAsset => '';
+  @override
+  String get idleAsset => '';
 
   @override
   Future<void> onLoad() async {

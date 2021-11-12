@@ -6,17 +6,22 @@ class Hog extends Unit {
   static const int hogHp = 50;
   static const int hogSpeed = 50;
 
-  Hog(
-    Vector2? position,
+  Hog({
+    required Block block,
     Vector2? size,
     int? priority,
-  ) : super(
+  }) : super(
           hp: hogHp,
           speed: hogSpeed,
-          position: position,
           size: size,
           priority: priority,
+                    block: block,
         );
+
+  @override
+  String get movingAsset => '';
+  @override
+  String get idleAsset => '';
 
   @override
   Future<void> onLoad() async {

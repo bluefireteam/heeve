@@ -9,10 +9,10 @@ enum AnimationState {
 }
 
 enum DirectionState {
-  up,
-  down,
-  left,
-  right,
+  upLeft,
+  upRight,
+  downLeft,
+  downRight,
 }
 
 class UnitAnimationState extends Equatable {

@@ -6,17 +6,22 @@ class FlameThrower extends Unit {
   static const int flameThrowerHp = 50;
   static const int flameThrowerSpeed = 50;
 
-  FlameThrower(
-    Vector2? position,
+  FlameThrower({
+    required Block block,
     Vector2? size,
     int? priority,
-  ) : super(
+  }) : super(
           hp: flameThrowerHp,
           speed: flameThrowerSpeed,
-          position: position,
           size: size,
           priority: priority,
+                    block: block,
         );
+
+  @override
+  String get movingAsset => '';
+  @override
+  String get idleAsset => '';
 
   @override
   Future<void> onLoad() async {

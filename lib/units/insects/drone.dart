@@ -6,17 +6,23 @@ class Drone extends Unit {
   static const int droneHp = 50;
   static const int droneSpeed = 50;
 
-  Drone(
-    Vector2? position,
+  Drone({
+    required Block block,
     Vector2? size,
     int? priority,
-  ) : super(
+  }) : super(
           hp: droneHp,
           speed: droneSpeed,
-          position: position,
           size: size,
           priority: priority,
+                    block: block,
+
         );
+
+  @override
+  String get movingAsset => '';
+  @override
+  String get idleAsset => '';
 
   @override
   Future<void> onLoad() async {
