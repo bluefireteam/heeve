@@ -17,6 +17,7 @@ class Infantry extends Unit {
           speed: infantrySpeed,
           size: Vector2(50, 50),
           priority: 10,
+          anchor: const Anchor(0.1, 0.6),
           block: block,
         );
 

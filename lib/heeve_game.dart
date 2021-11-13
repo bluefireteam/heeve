@@ -16,6 +16,7 @@ class HeeveGame extends FlameGame
         ScrollDetector,
         PanDetector,
         TapDetector,
+        SecondaryTapDetector,
         KeyboardEvents,
         HasCollidables {
   late final IsometricTileMapComponent map;
@@ -31,6 +32,7 @@ class HeeveGame extends FlameGame
   Future<void> onLoad() async {
     await super.onLoad();
     camera.speed = 5000;
+    camera.snapTo(Vector2(-250, -200));
     camera.viewport = FixedResolutionViewport(Vector2(800, 600));
 
     final tileset = SpriteSheet(
@@ -41,7 +43,7 @@ class HeeveGame extends FlameGame
     add(map = IsometricTileMapComponent(tileset, matrix));
     add(selector = Selector(tileset.getSprite(3, 3)));
 
-    final infantry = Infantry(block: Block(5, 8));
+    final infantry = Infantry(block: Block(0, 0));
     add(infantry);
   }
 
@@ -60,17 +62,29 @@ class HeeveGame extends FlameGame
     final pos = details.eventPosition.game;
     final block = map.getBlock(pos);
 
+    selectedUnits.forEach((unit) {
+      unit.selected = false;
+    });
+
     final selectedUnit = children.whereType<Unit>().where(
           (child) => child.block.x == block.x && child.block.y == block.y,
         );
 
     if (selectedUnit.isNotEmpty) {
       selectedUnits.addAll(selectedUnit.toList());
-    } else {
-      selectedUnits.forEach((unit) {
-        unit.target = block;
+      selectedUnit.forEach((unit) {
+        unit.selected = true;
       });
     }
+  }
+
+  @override
+  void onSecondaryTapUp(TapUpInfo details) {
+    final pos = details.eventPosition.game;
+    final block = map.getBlock(pos);
+    selectedUnits.forEach((unit) {
+      unit.target = block;
+    });
   }
 
   @override
