@@ -30,28 +30,31 @@ class UnitAnimationState extends Equatable {
     return UnitAnimationState(animation: animation, direction: direction);
   }
 
-  static UnitAnimationState withDirection(AnimationState animationState, double angle) {
-      if (angle > 0 && angle < pi / 2) {
-        return UnitAnimationState(
-          animation: animationState,
-          direction: DirectionState.upRight,
-        );
-      } else if (angle > pi / 2 && angle < pi) {
-        return UnitAnimationState(
-          animation: animationState,
-          direction: DirectionState.upLeft,
-        );
-      } else if (angle < 0 && angle > -pi / 2) {
-        return UnitAnimationState(
-          animation: animationState,
-          direction: DirectionState.downRight,
-        );
-      } else {
-        return UnitAnimationState(
-          animation: animationState,
-          direction: DirectionState.downLeft,
-        );
-      }
+  static UnitAnimationState withDirection(
+    AnimationState animationState,
+    double angle,
+  ) {
+    if (angle > 0 && angle < pi / 2) {
+      return UnitAnimationState(
+        animation: animationState,
+        direction: DirectionState.upRight,
+      );
+    } else if (angle > pi / 2 && angle < pi) {
+      return UnitAnimationState(
+        animation: animationState,
+        direction: DirectionState.upLeft,
+      );
+    } else if (angle < 0 && angle > -pi / 2) {
+      return UnitAnimationState(
+        animation: animationState,
+        direction: DirectionState.downRight,
+      );
+    } else {
+      return UnitAnimationState(
+        animation: animationState,
+        direction: DirectionState.downLeft,
+      );
+    }
   }
 
   @override
