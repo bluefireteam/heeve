@@ -10,22 +10,13 @@ dependencies:
     sdk: flutter
   equatable: ^2.0.3
   flame:
-    git:
-      url: https://github.com/flame-engine/flame.git
-      path: packages/flame
-      ref: main
+    path: ../flame/packages/flame
   flame_fire_atlas:
-    git:
-      url: https://github.com/flame-engine/flame.git
-      path: packages/flame_fire_atlas
-      ref: main
+    path: ../flame/packages/flame_fire_atlas
 
 dependency_overrides:
   flame:
-    git:
-      url: https://github.com/flame-engine/flame.git
-      path: packages/flame
-      ref: main
+    path: ../flame/packages/flame
 
 dev_dependencies:
   flame_lint: ^0.0.1

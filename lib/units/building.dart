@@ -2,7 +2,7 @@ import 'package:flame/components.dart';
 
 import 'unit.dart';
 
-class Building extends Unit {
+abstract class Building extends Unit {
   Building({
     required int hp,
     required Block block,
