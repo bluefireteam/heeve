@@ -7,16 +7,15 @@ class Drone extends Unit {
   static const int droneSpeed = 50;
 
   Drone({
-    required Block block,
+    required Vector2 position,
     Vector2? size,
     int? priority,
   }) : super(
+          position: position,
           hp: droneHp,
           speed: droneSpeed,
           size: size,
           priority: priority,
-                    block: block,
-
         );
 
   @override

@@ -1,5 +1,4 @@
-import 'dart:ui';
-
+import 'package:dartlin/dartlin.dart';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flame/input.dart';
@@ -14,15 +13,16 @@ class HeeveGame extends FlameGame
     with
         MouseMovementDetector,
         ScrollDetector,
-        PanDetector,
         TapDetector,
         SecondaryTapDetector,
+        PanDetector,
         KeyboardEvents,
         HasCollidables {
+  late final SpriteSheet tileset;
   late final IsometricTileMapComponent map;
   late final Selector selector;
 
-  static const movementBoundaries = 10;
+  static const movementBoundaries = 20;
   static const cameraMovementSpeed = 150.0;
 
   Vector2? movingCamera;
@@ -35,16 +35,25 @@ class HeeveGame extends FlameGame
     camera.snapTo(Vector2(-250, -200));
     camera.viewport = FixedResolutionViewport(Vector2(800, 600));
 
-    final tileset = SpriteSheet(
+    tileset = SpriteSheet(
       image: await images.load('tileset.png'),
       srcSize: Vector2.all(32.0),
     );
     final matrix = MapGenerator.generateMap();
-    add(map = IsometricTileMapComponent(tileset, matrix));
-    add(selector = Selector(tileset.getSprite(3, 3)));
+    add(map = IsometricTileMapComponent(tileset, matrix, tileHeight: 8));
 
-    final infantry = Infantry(block: Block(0, 0));
-    add(infantry);
+    add(
+      Infantry(
+        position: map.getBlockCenterPosition(Block(0, 0)),
+      ),
+    );
+    add(
+      Infantry(
+        position: map.getBlockCenterPosition(Block(3, 8)),
+      ),
+    );
+
+    add(selector = Selector());
   }
 
   @override
@@ -59,23 +68,15 @@ class HeeveGame extends FlameGame
 
   @override
   void onTapUp(TapUpInfo details) {
+    unselectAll();
+
     final pos = details.eventPosition.game;
     final block = map.getBlock(pos);
 
-    selectedUnits.forEach((unit) {
-      unit.selected = false;
-    });
-
-    final selectedUnit = children.whereType<Unit>().where(
-          (child) => child.block.x == block.x && child.block.y == block.y,
-        );
-
-    if (selectedUnit.isNotEmpty) {
-      selectedUnits.addAll(selectedUnit.toList());
-      selectedUnit.forEach((unit) {
-        unit.selected = true;
-      });
-    }
+    children
+        .whereType<Unit>()
+        .where((unit) => unit.containsBlock(block))
+        .forEach(select);
   }
 
   @override
@@ -88,25 +89,61 @@ class HeeveGame extends FlameGame
   }
 
   @override
+  void onPanStart(DragStartInfo info) {
+    selector.selectionStart = info.eventPosition.game;
+  }
+
+  @override
+  void onPanUpdate(DragUpdateInfo info) {
+    selector.selectionStart ??= info.eventPosition.game;
+    selector.selectionEnd = info.eventPosition.game;
+  }
+
+  @override
+  void onPanEnd(DragEndInfo info) {
+    unselectAll();
+
+    final start = selector.selectionStart?.let(map.getBlock);
+    final end = selector.selectionEnd?.let(map.getBlock);
+    if (start != null && end != null) {
+      children
+          .whereType<Unit>()
+          .where((unit) => unit.intersectsBlock(start, end))
+          .forEach(select);
+    }
+
+    onPanCancel();
+  }
+
+  @override
+  void onPanCancel() {
+    selector.selectionStart = null;
+    selector.selectionEnd = null;
+  }
+
+  void unselectAll() {
+    selectedUnits.forEach((unit) => unit.selected = false);
+    selectedUnits.clear();
+  }
+
+  void select(Unit unit) {
+    selectedUnits.add(unit);
+    unit.selected = true;
+  }
+
+  @override
   void onMouseMove(PointerHoverInfo details) {
     final mousePosition = details.eventPosition.global;
+    final windowSize = camera.viewport.canvasSize!;
     movingCamera = null;
     if (mousePosition.x <= movementBoundaries) {
       movingCamera = Vector2(-1, 0);
     } else if (mousePosition.y <= movementBoundaries) {
       movingCamera = Vector2(0, -1);
-    } else if (mousePosition.x >=
-        camera.viewport.effectiveSize.x - movementBoundaries) {
+    } else if (mousePosition.x >= windowSize.x - movementBoundaries) {
       movingCamera = Vector2(1, 0);
-    } else if (mousePosition.y >=
-        camera.viewport.effectiveSize.y - movementBoundaries) {
+    } else if (mousePosition.y >= windowSize.y - movementBoundaries) {
       movingCamera = Vector2(0, 1);
-    } else {
-      final pos = details.eventPosition.game;
-      final block = map.getBlock(pos);
-      if (map.containsBlock(block)) {
-        selector.block = block;
-      }
     }
   }
 

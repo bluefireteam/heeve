@@ -7,15 +7,15 @@ class Worker extends Unit {
   static const int workerSpeed = 10;
 
   Worker({
-    required Block block,
+    required Vector2 position,
     Vector2? size,
     int? priority,
   }) : super(
+          position: position,
           hp: workerHp,
           speed: workerSpeed,
           size: size,
           priority: priority,
-                    block: block,
         );
 
   @override

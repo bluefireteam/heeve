@@ -7,15 +7,15 @@ class Hog extends Unit {
   static const int hogSpeed = 50;
 
   Hog({
-    required Block block,
+    required Vector2 position,
     Vector2? size,
     int? priority,
   }) : super(
+          position: position,
           hp: hogHp,
           speed: hogSpeed,
           size: size,
           priority: priority,
-                    block: block,
         );
 
   @override

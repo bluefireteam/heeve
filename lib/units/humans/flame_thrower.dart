@@ -7,15 +7,15 @@ class FlameThrower extends Unit {
   static const int flameThrowerSpeed = 50;
 
   FlameThrower({
-    required Block block,
+    required Vector2 position,
     Vector2? size,
     int? priority,
   }) : super(
+          position: position,
           hp: flameThrowerHp,
           speed: flameThrowerSpeed,
           size: size,
           priority: priority,
-                    block: block,
         );
 
   @override

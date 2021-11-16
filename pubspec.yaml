@@ -9,6 +9,7 @@ dependencies:
   flutter:
     sdk: flutter
   equatable: ^2.0.3
+  dartlin: ^0.6.1
   flame:
     path: ../flame/packages/flame
   flame_fire_atlas:
