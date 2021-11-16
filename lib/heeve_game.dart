@@ -44,12 +44,12 @@ class HeeveGame extends FlameGame
 
     add(
       Infantry(
-        position: map.getBlockCenterPosition(Block(0, 0)),
+        position: map.getBlockCenterPosition(const Block(0, 0)),
       ),
     );
     add(
       Infantry(
-        position: map.getBlockCenterPosition(Block(3, 8)),
+        position: map.getBlockCenterPosition(const Block(3, 8)),
       ),
     );
 
