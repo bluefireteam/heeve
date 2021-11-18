@@ -11,13 +11,22 @@ dependencies:
   equatable: ^2.0.3
   dartlin: ^0.6.1
   flame:
-    path: ../flame/packages/flame
+    git:
+      url: https://github.com/flame-engine/flame.git
+      path: packages/flame
+      ref: main
   flame_fire_atlas:
-    path: ../flame/packages/flame_fire_atlas
+    git:
+      url: https://github.com/flame-engine/flame.git
+      path: packages/flame_fire_atlas
+      ref: main
 
 dependency_overrides:
   flame:
-    path: ../flame/packages/flame
+    git:
+      url: https://github.com/flame-engine/flame.git
+      path: packages/flame
+      ref: main
 
 dev_dependencies:
   flame_lint: ^0.0.1
