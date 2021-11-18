@@ -6,15 +6,14 @@ class Nursery extends Building {
   static const int nurseryHp = 1000;
 
   Nursery({
-    required Block block,
+    required Vector2 position,
     Vector2? size,
     int? priority,
   }) : super(
+          position: position,
           hp: nurseryHp,
           size: size,
           priority: priority,
-                    block: block,
-
         );
 
   @override

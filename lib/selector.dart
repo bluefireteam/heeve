@@ -1,22 +1,26 @@
+import 'dart:ui';
+
 import 'package:flame/components.dart';
+import 'package:flame/palette.dart';
 
-import 'heeve_game.dart';
+class Selector extends Component {
+  static final _selectorPaint = Paint()
+    ..color = BasicPalette.red.color
+    ..style = PaintingStyle.stroke
+    ..strokeWidth = 2;
 
-class Selector extends SpriteComponent with HasGameRef<HeeveGame> {
-  Block? block;
-
-  Selector(Sprite sprite) : super(sprite: sprite, size: sprite.srcSize);
+  Vector2? selectionStart, selectionEnd;
 
   @override
-  void update(double dt) {
-    super.update(dt);
-
-    final block = this.block;
-    if (block != null) {
-      position = gameRef.map.getBlockPosition(block);
+  void render(Canvas c) {
+    final start = selectionStart;
+    final end = selectionEnd;
+    if (start == null || end == null) {
+      return;
     }
+
+    c.drawRect(start & (end - start), _selectorPaint);
   }
 
-  @override
-  int get priority => 1;
+  int get priorty => 10;
 }

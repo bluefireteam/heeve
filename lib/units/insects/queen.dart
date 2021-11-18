@@ -7,16 +7,15 @@ class Queen extends Unit {
   static const int queenSpeed = 1000;
 
   Queen({
-    required Block block,
+    required Vector2 position,
     Vector2? size,
     int? priority,
   }) : super(
+          position: position,
           hp: queenHp,
           speed: queenSpeed,
           size: size,
           priority: priority,
-                    block: block,
-
         );
 
   @override

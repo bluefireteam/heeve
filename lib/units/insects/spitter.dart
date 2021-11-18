@@ -7,16 +7,15 @@ class Spitter extends Unit {
   static const int spitterSpeed = 25;
 
   Spitter({
-    required Block block,
+    required Vector2 position,
     Vector2? size,
     int? priority,
   }) : super(
+          position: position,
           hp: spitterHp,
           speed: spitterSpeed,
           size: size,
           priority: priority,
-                    block: block,
-
         );
 
   @override
