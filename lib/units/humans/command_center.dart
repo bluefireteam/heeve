@@ -6,14 +6,14 @@ class CommandCenter extends Building {
   static const int commandCenterHp = 1000;
 
   CommandCenter({
-      required Block block,
+    required Vector2 position,
     Vector2? size,
     int? priority,
   }) : super(
+          position: position,
           hp: commandCenterHp,
           size: size,
           priority: priority,
-          block: block,
         );
 
   @override

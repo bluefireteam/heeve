@@ -1,12 +1,11 @@
 import 'dart:math';
-import 'dart:ui';
 
 import 'package:flame/components.dart';
-import 'package:flutter/material.dart';
-import 'package:heeve/units/unit_animation_state.dart';
 import 'package:flame_fire_atlas/flame_fire_atlas.dart';
 
 import '../heeve_game.dart';
+import '../highlight.dart';
+import 'unit_animation_state.dart';
 
 /// A unit is anything that can be attacked and has different animations.
 /// Example of units could be different types of insects, humans, building and
@@ -19,18 +18,18 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
   final int hp;
   final int speed;
 
-  static final _selectPaint = Paint()
-      ..color = Colors.red
-      ..style = PaintingStyle.stroke;
-
-  bool selected = false;
-  Block block;
   Block? target;
+
+  bool _selected = false;
+  bool get selected => _selected;
+  set selected(bool selected) {
+    _selected = selected;
+    highlight.visible = selected;
+  }
 
   Unit({
     required this.hp,
     required this.speed,
-    required this.block,
     Vector2? position,
     Vector2? size,
     int? priority,
@@ -42,7 +41,7 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
           ),
           position: position,
           size: size,
-          anchor: anchor ?? Anchor.center,
+          anchor: anchor,
           priority: priority,
         );
 
@@ -54,12 +53,19 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
 
   String _asset(String path) => 'sprites/$path';
 
+  Block get block => gameRef.map.getBlock(position);
+
+  Highlight get highlight => children.first as Highlight;
+
   @override
   void update(double dt) {
     super.update(dt);
 
+    highlight.position =
+        gameRef.map.getBlockRenderPosition(block) - topLeftPosition;
+
     if (target != null) {
-      final targetBlockPosition = gameRef.map.getBlockPosition(target!);
+      final targetBlockPosition = gameRef.map.getBlockCenterPosition(target!);
       final direction = targetBlockPosition - position;
       final step = speed * dt;
 
@@ -81,19 +87,8 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
   }
 
   @override
-  void render(Canvas canvas) {
-    super.render(canvas);
-
-    if (selected) {
-      canvas.drawRect(size.toRect(), _selectPaint);
-    }
-  }
-
-  @override
-  Future<void>? onLoad() async {
+  Future<void> onLoad() async {
     await super.onLoad();
-
-    position = gameRef.map.getBlockPosition(block); // - offset;
 
     animations = {};
 
@@ -118,5 +113,19 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
         direction: directionState,
       )] = movingAtlas.getAnimation(_formatDirectionState(directionState));
     });
+
+    await add(Highlight());
+  }
+
+  bool containsBlock(Block block) => this.block == block;
+
+  bool intersectsBlock(Block start, Block end) {
+    final block = this.block;
+    final minX = min(start.x, end.x);
+    final maxX = max(start.x, end.x);
+    final minY = min(start.y, end.y);
+    final maxY = max(start.y, end.y);
+    return (block.x >= minX && block.x <= maxX) &&
+        (block.y >= minY && block.y <= maxY);
   }
 }

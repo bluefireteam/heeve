@@ -9,6 +9,7 @@ dependencies:
   flutter:
     sdk: flutter
   equatable: ^2.0.3
+  dartlin: ^0.6.1
   flame:
     git:
       url: https://github.com/flame-engine/flame.git
