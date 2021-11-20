@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:ui';
 
 import 'package:flame/components.dart';
 import 'package:flame_fire_atlas/flame_fire_atlas.dart';
@@ -56,6 +57,22 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
   Block get block => gameRef.map.getBlock(position);
 
   Highlight get highlight => children.first as Highlight;
+
+  @override
+  void renderTree(Canvas canvas) {
+    canvas.save();
+    canvas.transform(transformMatrix.storage);
+
+    children.forEach((c) => c.renderTree(canvas));
+    render(canvas);
+
+    // Any debug rendering should be rendered on top of everything
+    if (debugMode) {
+      renderDebugMode(canvas);
+    }
+
+    canvas.restore();
+  }
 
   @override
   void update(double dt) {

@@ -1,8 +1,10 @@
-import 'package:dartlin/dartlin.dart';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
+import 'package:flame/image_composition.dart';
 import 'package:flame/input.dart';
 import 'package:flame/sprite.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 
 import 'map_generator.dart';
 import 'selector.dart';
@@ -25,12 +27,13 @@ class HeeveGame extends FlameGame
   static const movementBoundaries = 20;
   static const cameraMovementSpeed = 150.0;
 
-  Vector2? movingCamera;
+  Vector2 cameraDirection = Vector2.zero();
   List<Unit> selectedUnits = [];
 
   @override
   Future<void> onLoad() async {
     await super.onLoad();
+
     camera.speed = 5000;
     camera.snapTo(Vector2(-250, -200));
     camera.viewport = FixedResolutionViewport(Vector2(800, 600));
@@ -60,10 +63,8 @@ class HeeveGame extends FlameGame
   void update(double dt) {
     super.update(dt);
 
-    if (movingCamera != null) {
-      camera.translateBy(movingCamera! * cameraMovementSpeed * dt);
-      camera.snap();
-    }
+    camera.translateBy(cameraDirection * cameraMovementSpeed * dt);
+    camera.snap();
   }
 
   @override
@@ -103,13 +104,14 @@ class HeeveGame extends FlameGame
   void onPanEnd(DragEndInfo info) {
     unselectAll();
 
-    final start = selector.selectionStart?.let(map.getBlock);
-    final end = selector.selectionEnd?.let(map.getBlock);
+    final start = selector.selectionStart;
+    final end = selector.selectionEnd;
     if (start != null && end != null) {
-      children
-          .whereType<Unit>()
-          .where((unit) => unit.intersectsBlock(start, end))
-          .forEach(select);
+      final selectionRect = Rect.fromPoints(start.toOffset(), end.toOffset());
+      children.whereType<Unit>().where((unit) {
+        final p = map.getBlockCenterPosition(unit.block);
+        return selectionRect.contains(p.toOffset());
+      }).forEach(select);
     }
 
     onPanCancel();
@@ -135,15 +137,16 @@ class HeeveGame extends FlameGame
   void onMouseMove(PointerHoverInfo details) {
     final mousePosition = details.eventPosition.global;
     final windowSize = camera.viewport.canvasSize!;
-    movingCamera = null;
     if (mousePosition.x <= movementBoundaries) {
-      movingCamera = Vector2(-1, 0);
+      cameraDirection.setValues(-1, 0);
     } else if (mousePosition.y <= movementBoundaries) {
-      movingCamera = Vector2(0, -1);
+      cameraDirection.setValues(0, -1);
     } else if (mousePosition.x >= windowSize.x - movementBoundaries) {
-      movingCamera = Vector2(1, 0);
+      cameraDirection.setValues(1, 0);
     } else if (mousePosition.y >= windowSize.y - movementBoundaries) {
-      movingCamera = Vector2(0, 1);
+      cameraDirection.setValues(0, 1);
+    } else {
+      cameraDirection.setValues(0, 0);
     }
   }
 
@@ -153,5 +156,62 @@ class HeeveGame extends FlameGame
     final idx =
         zooms.indexOf(camera.zoom) - event.scrollDelta.game.y.sign.toInt();
     camera.zoom = zooms[idx % zooms.length];
+  }
+
+  @override
+  KeyEventResult onKeyEvent(
+    RawKeyEvent event,
+    Set<LogicalKeyboardKey> keysPressed,
+  ) {
+    final isDown = event is RawKeyDownEvent;
+    final w = LogicalKeyboardKey.keyW;
+    final a = LogicalKeyboardKey.keyA;
+    final s = LogicalKeyboardKey.keyS;
+    final d = LogicalKeyboardKey.keyD;
+    final e = LogicalKeyboardKey.keyE;
+    final q = LogicalKeyboardKey.keyQ;
+    final move = cameraDirection;
+
+    if (event.logicalKey == e && isDown) {
+      camera.zoom *= 2;
+    } else if (event.logicalKey == q && isDown) {
+      camera.zoom /= 2;
+    }
+
+    if (event.logicalKey == w) {
+      if (isDown) {
+        move.y = -1;
+      } else if (keysPressed.contains(s)) {
+        move.y = 1;
+      } else {
+        move.y = 0;
+      }
+    } else if (event.logicalKey == s) {
+      if (isDown) {
+        move.y = 1;
+      } else if (keysPressed.contains(w)) {
+        move.y = -1;
+      } else {
+        move.y = 0;
+      }
+    } else if (event.logicalKey == a) {
+      if (isDown) {
+        move.x = -1;
+      } else if (keysPressed.contains(d)) {
+        move.x = 1;
+      } else {
+        move.x = 0;
+      }
+    } else if (event.logicalKey == d) {
+      if (isDown) {
+        move.x = 1;
+      } else if (keysPressed.contains(a)) {
+        move.x = -1;
+      } else {
+        move.x = 0;
+      }
+    }
+
+    return KeyEventResult.handled;
   }
 }
