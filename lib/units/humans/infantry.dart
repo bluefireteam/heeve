@@ -1,4 +1,5 @@
 import 'package:flame/components.dart';
+import 'package:flame/geometry.dart';
 
 import '../unit.dart';
 
@@ -16,6 +17,12 @@ class Infantry extends Unit {
           priority: 10,
           anchor: Anchor.bottomCenter,
         );
+
+  @override
+  Future<void> onLoad() async {
+    await super.onLoad();
+    addHitbox(HitboxRectangle(relation: Vector2(0.3, 0.7)));
+  }
 
   @override
   String get movingAsset => 'humans/foot-soldier.fa';

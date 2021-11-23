@@ -6,9 +6,12 @@ import 'package:flame/sprite.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
+import 'building_button.dart';
 import 'map_generator.dart';
 import 'selector.dart';
+import 'side_bar.dart';
 import 'units/humans/infantry.dart';
+import 'units/insects/butterfly.dart';
 import 'units/unit.dart';
 
 class HeeveGame extends FlameGame
@@ -22,6 +25,7 @@ class HeeveGame extends FlameGame
         HasCollidables {
   late final SpriteSheet tileset;
   late final IsometricTileMapComponent map;
+  late final List<List<int>> matrix;
   late final Selector selector;
 
   static const movementBoundaries = 20;
@@ -29,6 +33,10 @@ class HeeveGame extends FlameGame
 
   Vector2 cameraDirection = Vector2.zero();
   List<Unit> selectedUnits = [];
+  // To circumvent not being able to add `HasTappables`
+  final List<ButtonComponent> tappableButtons = [];
+
+  final ValueNotifier<int> currencyNotifier = ValueNotifier<int>(0);
 
   @override
   Future<void> onLoad() async {
@@ -42,7 +50,7 @@ class HeeveGame extends FlameGame
       image: await images.load('tileset.png'),
       srcSize: Vector2.all(32.0),
     );
-    final matrix = MapGenerator.generateMap();
+    matrix = MapGenerator.generateMap();
     add(map = IsometricTileMapComponent(tileset, matrix, tileHeight: 8));
 
     add(
@@ -55,8 +63,16 @@ class HeeveGame extends FlameGame
         position: map.getBlockCenterPosition(const Block(3, 8)),
       ),
     );
+    final butterflies = List<Butterfly>.generate(
+      10,
+      (i) => Butterfly(
+        position: map.getBlockCenterPosition(Block(i + i % 2, i + i % 3 - 1)),
+      ),
+    );
+    addAll(butterflies);
 
     add(selector = Selector());
+    add(SideBar());
   }
 
   @override
@@ -68,7 +84,18 @@ class HeeveGame extends FlameGame
   }
 
   @override
+  void onTapDown(TapDownInfo details) {
+    tappableButtons
+        .where((t) => t.containsPoint(details.eventPosition.viewportOnly))
+        .forEach((t) => t.onTapDown());
+  }
+
+  @override
   void onTapUp(TapUpInfo details) {
+    tappableButtons
+        .where((t) => t.containsPoint(details.eventPosition.viewportOnly))
+        .forEach((t) => t.onTapUp());
+
     unselectAll();
 
     final pos = details.eventPosition.game;
@@ -81,9 +108,14 @@ class HeeveGame extends FlameGame
   }
 
   @override
+  void onTapCancel() {
+    tappableButtons.forEach((t) => t.onTapCancel());
+  }
+
+  @override
   void onSecondaryTapUp(TapUpInfo details) {
-    final pos = details.eventPosition.game;
-    final block = map.getBlock(pos);
+    final position = details.eventPosition.game;
+    final block = map.getBlock(position);
     selectedUnits.forEach((unit) {
       unit.target = block;
     });

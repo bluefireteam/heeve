@@ -8,4 +8,5 @@ creatures and save your home. They might have advanced technologies, but we
 have the might of the hive!
 
 
-
+## External credits
+Buttons from: https://adwitr.itch.io/button-asset-pack
