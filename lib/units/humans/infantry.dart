@@ -25,8 +25,14 @@ class Infantry extends Unit {
   }
 
   @override
-  String get movingAsset => 'humans/foot-soldier.fa';
+  String get moveAsset => 'humans/infantry.fa';
 
   @override
-  String get idleAsset => 'humans/foot-soldier-idle.fa';
+  String get idleAsset => 'humans/infantry-idle.fa';
+
+  @override
+  String get attackAsset => 'humans/infantry-attack.fa';
+
+  @override
+  String get dieAsset => 'humans/infantry-die.fa';
 }

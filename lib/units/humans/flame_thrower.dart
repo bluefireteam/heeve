@@ -19,7 +19,7 @@ class FlameThrower extends Unit {
         );
 
   @override
-  String get movingAsset => '';
+  String get moveAsset => '';
   @override
   String get idleAsset => '';
 

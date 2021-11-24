@@ -46,8 +46,10 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
           priority: priority,
         );
 
-  String get movingAsset;
+  String get moveAsset;
   String get idleAsset;
+  String get dieAsset => idleAsset;
+  String get attackAsset => idleAsset;
 
   String _formatDirectionState(DirectionState state) =>
       state.toString().split('.')[1];
@@ -88,7 +90,7 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
 
       final angle = direction.angleToSigned(Vector2(1, 0));
       current = UnitAnimationState.withDirection(
-        AnimationState.moving,
+        AnimationState.move,
         angle,
       );
 
@@ -109,27 +111,21 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
 
     animations = {};
 
-    final idleAtlas = await gameRef.loadFireAtlas(
-      _asset(idleAsset),
-    );
+    createAnimationState(String asset, AnimationState state) async {
+      final atlas = await gameRef.loadFireAtlas(_asset(asset));
 
-    DirectionState.values.forEach((directionState) {
-      animations![UnitAnimationState(
-        animation: AnimationState.idle,
-        direction: directionState,
-      )] = idleAtlas.getAnimation(_formatDirectionState(directionState));
-    });
+      DirectionState.values.forEach((directionState) {
+        animations![UnitAnimationState(
+          animation: state,
+          direction: directionState,
+        )] = atlas.getAnimation(_formatDirectionState(directionState));
+      });
+    }
 
-    final movingAtlas = await gameRef.loadFireAtlas(
-      _asset(movingAsset),
-    );
-
-    DirectionState.values.forEach((directionState) {
-      animations![UnitAnimationState(
-        animation: AnimationState.moving,
-        direction: directionState,
-      )] = movingAtlas.getAnimation(_formatDirectionState(directionState));
-    });
+    await createAnimationState(idleAsset, AnimationState.idle);
+    await createAnimationState(moveAsset, AnimationState.move);
+    await createAnimationState(attackAsset, AnimationState.attack);
+    await createAnimationState(dieAsset, AnimationState.die);
 
     await add(Highlight());
   }

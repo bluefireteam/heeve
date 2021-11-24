@@ -17,7 +17,7 @@ class Nursery extends Building {
         );
 
   @override
-  String get movingAsset => '';
+  String get moveAsset => '';
   @override
   String get idleAsset => '';
 

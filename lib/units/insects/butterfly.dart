@@ -49,9 +49,16 @@ class Butterfly extends SpriteAnimationComponent
       _isPickedUp = true;
       gameRef.currencyNotifier.value++;
       add(
+        RotateEffect(
+          angle: 3,
+          duration: 1.8,
+          curve: Curves.elasticOut,
+        ),
+      );
+      add(
         SizeEffect(
           size: Vector2.zero(),
-          duration: 0.8,
+          duration: 1.9,
           curve: Curves.elasticOut,
           onComplete: removeFromParent,
         ),

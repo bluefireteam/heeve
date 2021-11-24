@@ -43,7 +43,6 @@ class HeeveGame extends FlameGame
     await super.onLoad();
 
     camera.speed = 5000;
-    camera.snapTo(Vector2(-250, -200));
     camera.viewport = FixedResolutionViewport(Vector2(800, 600));
 
     tileset = SpriteSheet(
@@ -52,6 +51,16 @@ class HeeveGame extends FlameGame
     );
     matrix = MapGenerator.generateMap();
     add(map = IsometricTileMapComponent(tileset, matrix, tileHeight: 8));
+    final mapWidth = map.matrix.length;
+    final mapHeight = map.matrix.first.length;
+    camera.followVector2(
+      map.getBlockCenterPosition(
+        Block(
+          (mapWidth / 2).floor(),
+          (mapHeight / 2).floor(),
+        ),
+      ),
+    );
 
     add(
       Infantry(

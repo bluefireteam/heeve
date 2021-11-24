@@ -19,7 +19,7 @@ class Queen extends Unit {
         );
 
   @override
-  String get movingAsset => '';
+  String get moveAsset => '';
   @override
   String get idleAsset => '';
 
