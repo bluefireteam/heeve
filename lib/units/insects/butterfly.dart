@@ -24,6 +24,7 @@ class Butterfly extends SpriteAnimationComponent
           size: size ?? Vector2.all(20),
           anchor: Anchor.center,
           playing: playing,
+          priority: 3,
         );
 
   @override

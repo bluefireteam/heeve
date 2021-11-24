@@ -14,7 +14,7 @@ class SideBar extends RectangleComponent with HasGameRef<HeeveGame> {
   bool isHud = true;
 
   @override
-  int get priority => 200;
+  int get priority => 5;
 
   static const double _width = 200;
   late final TextComponent currencyComponent;
@@ -69,11 +69,30 @@ class SideBar extends RectangleComponent with HasGameRef<HeeveGame> {
           ),
         ),
     );
+
+    final spaceshipSprite = await gameRef.loadSprite('human-spaceship.png');
+    SpriteComponent spaceship() {
+      return SpriteComponent(
+        sprite: spaceshipSprite,
+        size: Vector2(40, 32),
+        anchor: Anchor.center,
+      );
+    }
+
+    final firstButtonPosition = Vector2(15, 150);
     add(
-      ButtonComponent('green_buttons.png', position: Vector2(15, 150)),
+      BuildButton(
+        'green_buttons.png',
+        spaceship,
+        position: firstButtonPosition,
+      ),
     );
     add(
-      ButtonComponent('red_buttons.png', position: Vector2(15, 210)),
+      BuildButton(
+        'red_buttons.png',
+        spaceship,
+        position: firstButtonPosition + Vector2(0, BuildButton.defaultSize.y),
+      ),
     );
 
     gameRef.currencyNotifier.addListener(

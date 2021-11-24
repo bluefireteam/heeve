@@ -5,7 +5,7 @@ import 'package:flame/palette.dart';
 
 class Selector extends Component {
   @override
-  int get priority => 10;
+  int get priority => 5;
 
   static final _selectorPaint = Paint()
     ..color = BasicPalette.red.color

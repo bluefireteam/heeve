@@ -27,6 +27,7 @@ class HeeveGame extends FlameGame
   late final IsometricTileMapComponent map;
   late final List<List<int>> matrix;
   late final Selector selector;
+  PositionComponent? buildComponent;
 
   static const movementBoundaries = 20;
   static const cameraMovementSpeed = 150.0;
@@ -34,13 +35,14 @@ class HeeveGame extends FlameGame
   Vector2 cameraDirection = Vector2.zero();
   List<Unit> selectedUnits = [];
   // To circumvent not being able to add `HasTappables`
-  final List<ButtonComponent> tappableButtons = [];
+  final List<BuildButton> tappableButtons = [];
 
   final ValueNotifier<int> currencyNotifier = ValueNotifier<int>(0);
 
   @override
   Future<void> onLoad() async {
     await super.onLoad();
+    //debugMode = true;
 
     camera.speed = 5000;
     camera.viewport = FixedResolutionViewport(Vector2(800, 600));
@@ -94,6 +96,14 @@ class HeeveGame extends FlameGame
 
   @override
   void onTapDown(TapDownInfo details) {
+    final buildComponent = this.buildComponent;
+    if (buildComponent != null) {
+      buildComponent.position = map.getBlockCenterPosition(
+        map.getBlockRenderedAt(buildComponent.topLeftPosition),
+      );
+      this.buildComponent = null;
+    }
+
     tappableButtons
         .where((t) => t.containsPoint(details.eventPosition.viewportOnly))
         .forEach((t) => t.onTapDown());
@@ -121,6 +131,11 @@ class HeeveGame extends FlameGame
     tappableButtons.forEach((t) => t.onTapCancel());
   }
 
+  void clearBuildComponent() {
+    buildComponent?.removeFromParent();
+    buildComponent = null;
+  }
+
   @override
   void onSecondaryTapUp(TapUpInfo details) {
     final position = details.eventPosition.game;
@@ -128,6 +143,7 @@ class HeeveGame extends FlameGame
     selectedUnits.forEach((unit) {
       unit.target = block;
     });
+    clearBuildComponent();
   }
 
   @override
@@ -188,6 +204,12 @@ class HeeveGame extends FlameGame
       cameraDirection.setValues(0, 1);
     } else {
       cameraDirection.setValues(0, 0);
+    }
+
+    final buildComponent = this.buildComponent;
+    if (buildComponent != null) {
+      buildComponent.position = details.eventPosition.game;
+      map.getBlock(buildComponent.topLeftPosition);
     }
   }
 

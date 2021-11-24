@@ -43,7 +43,7 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
           position: position,
           size: size,
           anchor: anchor,
-          priority: priority,
+          priority: priority ?? 2,
         );
 
   String get moveAsset;
@@ -111,7 +111,10 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
 
     animations = {};
 
-    createAnimationState(String asset, AnimationState state) async {
+    Future<void> createAnimationState(
+      String asset,
+      AnimationState state,
+    ) async {
       final atlas = await gameRef.loadFireAtlas(_asset(asset));
 
       DirectionState.values.forEach((directionState) {

@@ -8,16 +8,24 @@ enum ButtonState {
   unpressed,
 }
 
-class ButtonComponent extends SpriteGroupComponent<ButtonState>
+class BuildButton extends SpriteGroupComponent<ButtonState>
     with HasGameRef<HeeveGame> {
   final String filename;
+  final PositionComponent Function() buildComponentFunction;
 
-  ButtonComponent(this.filename, {Vector2? position, Vector2? size})
-      : super(position: position, size: size ?? Vector2(34, 12.5) * 5);
+  static final Vector2 defaultSize = Vector2(34, 12.5) * 5;
+
+  BuildButton(
+    this.filename,
+    this.buildComponentFunction, {
+    Vector2? position,
+    Vector2? size,
+  }) : super(position: position, size: size ?? defaultSize);
 
   @override
   Future<void> onLoad() async {
     await super.onLoad();
+    children.register<PositionComponent>();
     final pressedSprite = await gameRef.loadSprite(
       filename,
       srcPosition: Vector2(0, 12.5),
@@ -34,6 +42,12 @@ class ButtonComponent extends SpriteGroupComponent<ButtonState>
     };
 
     current = ButtonState.unpressed;
+
+    final buildComponent = buildComponentFunction()
+      ..position = (BuildButton.defaultSize / 2)
+      ..y -= 6
+      ..anchor = Anchor.center;
+    add(buildComponent);
   }
 
   @override
@@ -55,16 +69,21 @@ class ButtonComponent extends SpriteGroupComponent<ButtonState>
 
   bool onTapDown() {
     current = ButtonState.pressed;
+    children.query<PositionComponent>().forEach((c) => c.position.y += 6);
+    final buildComponent = buildComponentFunction();
+    gameRef.clearBuildComponent();
+    gameRef.buildComponent = buildComponent;
+    gameRef.add(buildComponent);
     return true;
   }
 
   bool onTapUp() {
     current = ButtonState.unpressed;
+    children.query<PositionComponent>().forEach((c) => c.position.y -= 6);
     return true;
   }
 
   bool onTapCancel() {
-    current = ButtonState.unpressed;
-    return true;
+    return onTapUp();
   }
 }

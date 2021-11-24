@@ -13,7 +13,6 @@ class Worker extends Unit {
           hp: workerHp,
           speed: workerSpeed,
           size: Vector2.all(50),
-          priority: 10,
         );
 
   @override

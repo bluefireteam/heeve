@@ -14,7 +14,6 @@ class Infantry extends Unit {
           hp: infantryHp,
           speed: infantrySpeed,
           size: Vector2(50, 50),
-          priority: 10,
           anchor: Anchor.bottomCenter,
         );
 
