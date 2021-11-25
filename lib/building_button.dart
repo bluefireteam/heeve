@@ -1,23 +1,28 @@
 import 'package:flame/components.dart';
+import 'package:flame/effects.dart';
 import 'package:flame/input.dart';
 
+import 'currency_component.dart';
 import 'heeve_game.dart';
+import 'units/building.dart';
 
 enum ButtonState {
   pressed,
   unpressed,
 }
 
-class BuildButton extends SpriteGroupComponent<ButtonState>
+class BuildingButton extends SpriteGroupComponent<ButtonState>
     with HasGameRef<HeeveGame> {
   final String filename;
-  final PositionComponent Function() buildComponentFunction;
+  final Building Function() buildingComponentFunction;
+  late final int cost;
+  late final CurrencyComponent currencyComponent;
 
   static final Vector2 defaultSize = Vector2(34, 12.5) * 5;
 
-  BuildButton(
+  BuildingButton(
     this.filename,
-    this.buildComponentFunction, {
+    this.buildingComponentFunction, {
     Vector2? position,
     Vector2? size,
   }) : super(position: position, size: size ?? defaultSize);
@@ -43,11 +48,20 @@ class BuildButton extends SpriteGroupComponent<ButtonState>
 
     current = ButtonState.unpressed;
 
-    final buildComponent = buildComponentFunction()
-      ..position = (BuildButton.defaultSize / 2)
+    final buildingComponent = buildingComponentFunction()
+      ..position = (BuildingButton.defaultSize / 2)
       ..y -= 6
       ..anchor = Anchor.center;
-    add(buildComponent);
+    add(buildingComponent);
+
+    cost = buildingComponent.cost;
+    add(
+      currencyComponent = CurrencyComponent(
+        value: cost,
+        position: size - Vector2(20, 30),
+        fontSize: 10,
+      ),
+    );
   }
 
   @override
@@ -70,10 +84,20 @@ class BuildButton extends SpriteGroupComponent<ButtonState>
   bool onTapDown() {
     current = ButtonState.pressed;
     children.query<PositionComponent>().forEach((c) => c.position.y += 6);
-    final buildComponent = buildComponentFunction();
-    gameRef.clearBuildComponent();
-    gameRef.buildComponent = buildComponent;
-    gameRef.add(buildComponent);
+    if (gameRef.currencyNotifier.value >= cost) {
+      final buildComponent = buildingComponentFunction();
+      gameRef.clearBuildComponent();
+      gameRef.buildingComponent = buildComponent;
+      gameRef.add(buildComponent);
+    } else {
+      currencyComponent.add(
+        ScaleEffect(
+          scale: Vector2.all(1.5),
+          duration: 1,
+          isAlternating: true,
+        ),
+      );
+    }
     return true;
   }
 

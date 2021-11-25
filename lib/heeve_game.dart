@@ -1,4 +1,5 @@
 import 'package:flame/components.dart';
+import 'package:flame/effects.dart';
 import 'package:flame/game.dart';
 import 'package:flame/image_composition.dart';
 import 'package:flame/input.dart';
@@ -10,6 +11,7 @@ import 'building_button.dart';
 import 'map_generator.dart';
 import 'selector.dart';
 import 'side_bar.dart';
+import 'units/building.dart';
 import 'units/humans/infantry.dart';
 import 'units/insects/butterfly.dart';
 import 'units/unit.dart';
@@ -26,8 +28,9 @@ class HeeveGame extends FlameGame
   late final SpriteSheet tileset;
   late final IsometricTileMapComponent map;
   late final List<List<int>> matrix;
+  final List<Block> occupiedBlocks = [];
   late final Selector selector;
-  PositionComponent? buildComponent;
+  Building? buildingComponent;
 
   static const movementBoundaries = 20;
   static const cameraMovementSpeed = 150.0;
@@ -35,7 +38,7 @@ class HeeveGame extends FlameGame
   Vector2 cameraDirection = Vector2.zero();
   List<Unit> selectedUnits = [];
   // To circumvent not being able to add `HasTappables`
-  final List<BuildButton> tappableButtons = [];
+  final List<BuildingButton> tappableButtons = [];
 
   final ValueNotifier<int> currencyNotifier = ValueNotifier<int>(0);
 
@@ -64,26 +67,26 @@ class HeeveGame extends FlameGame
       ),
     );
 
-    add(
-      Infantry(
-        position: map.getBlockCenterPosition(const Block(0, 0)),
-      ),
-    );
-    add(
-      Infantry(
-        position: map.getBlockCenterPosition(const Block(3, 8)),
-      ),
-    );
-    final butterflies = List<Butterfly>.generate(
+    addOnBlock(Infantry(), const Block(0, 0));
+    addOnBlock(Infantry(), const Block(3, 8));
+    final butterflyBlocks = List<Block>.generate(
       10,
-      (i) => Butterfly(
-        position: map.getBlockCenterPosition(Block(i + i % 2, i + i % 3 - 1)),
-      ),
+      //(i) => Block(i, i),
+      (i) => Block(i + i % 2, i + i % 3),
     );
-    addAll(butterflies);
+    butterflyBlocks.forEach((block) => addOnBlock(Butterfly(), block));
 
     add(selector = Selector());
     add(SideBar());
+  }
+
+  bool addOnBlock(PositionComponent component, Block block) {
+    if (!occupiedBlocks.contains(block)) {
+      add(component..position = map.getBlockCenterPosition(block));
+      occupiedBlocks.add(block);
+      return true;
+    }
+    return false;
   }
 
   @override
@@ -96,12 +99,22 @@ class HeeveGame extends FlameGame
 
   @override
   void onTapDown(TapDownInfo details) {
-    final buildComponent = this.buildComponent;
-    if (buildComponent != null) {
-      buildComponent.position = map.getBlockCenterPosition(
-        map.getBlockRenderedAt(buildComponent.topLeftPosition),
-      );
-      this.buildComponent = null;
+    final building = buildingComponent;
+    if (building != null) {
+      final block = map.getBlockRenderedAt(building.topLeftPosition);
+      if (!occupiedBlocks.contains(block)) {
+        building.position = map.getBlockCenterPosition(block);
+        buildingComponent = null;
+        currencyNotifier.value -= building.cost;
+      } else {
+        building.add(
+          RotateEffect(
+            angle: 1,
+            duration: 0.5,
+            isAlternating: true,
+          ),
+        );
+      }
     }
 
     tappableButtons
@@ -132,8 +145,8 @@ class HeeveGame extends FlameGame
   }
 
   void clearBuildComponent() {
-    buildComponent?.removeFromParent();
-    buildComponent = null;
+    buildingComponent?.removeFromParent();
+    buildingComponent = null;
   }
 
   @override
@@ -206,7 +219,7 @@ class HeeveGame extends FlameGame
       cameraDirection.setValues(0, 0);
     }
 
-    final buildComponent = this.buildComponent;
+    final buildComponent = this.buildingComponent;
     if (buildComponent != null) {
       buildComponent.position = details.eventPosition.game;
       map.getBlock(buildComponent.topLeftPosition);

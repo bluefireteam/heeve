@@ -8,7 +8,7 @@ class Infantry extends Unit {
   static const int infantrySpeed = 50;
 
   Infantry({
-    required Vector2 position,
+    Vector2? position,
   }) : super(
           position: position,
           hp: infantryHp,
