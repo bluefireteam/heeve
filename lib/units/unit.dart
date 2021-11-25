@@ -90,7 +90,7 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
 
       final angle = direction.angleToSigned(Vector2(1, 0));
       current = UnitAnimationState.withDirection(
-        AnimationState.move,
+        AnimationState.die,
         angle,
       );
 

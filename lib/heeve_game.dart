@@ -219,10 +219,10 @@ class HeeveGame extends FlameGame
       cameraDirection.setValues(0, 0);
     }
 
-    final buildComponent = this.buildingComponent;
-    if (buildComponent != null) {
-      buildComponent.position = details.eventPosition.game;
-      map.getBlock(buildComponent.topLeftPosition);
+    final building = buildingComponent;
+    if (building != null) {
+      building.position = details.eventPosition.game;
+      map.getBlock(building.topLeftPosition);
     }
   }
 

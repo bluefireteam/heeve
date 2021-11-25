@@ -4,12 +4,12 @@ import 'package:flame/components.dart';
 import 'package:flame/input.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:heeve/building_button.dart';
-import 'package:heeve/currency_component.dart';
-import 'package:heeve/units/humans/spaceship.dart';
-import 'package:heeve/units/insects/butterfly.dart';
 
+import 'building_button.dart';
+import 'currency_component.dart';
 import 'heeve_game.dart';
+import 'units/humans/spaceship.dart';
+import 'units/insects/butterfly.dart';
 
 class SideBar extends RectangleComponent with HasGameRef<HeeveGame> {
   @override
@@ -46,10 +46,12 @@ class SideBar extends RectangleComponent with HasGameRef<HeeveGame> {
       ),
     );
 
-    await add(currencyComponent = CurrencyComponent(
-      value: gameRef.currencyNotifier.value,
-      position: Vector2(_width / 2, 120),
-    ));
+    await add(
+      currencyComponent = CurrencyComponent(
+        value: gameRef.currencyNotifier.value,
+        position: Vector2(_width / 2, 120),
+      ),
+    );
 
     final firstButtonPosition = Vector2(15, 150);
     add(
