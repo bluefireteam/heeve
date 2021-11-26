@@ -81,6 +81,7 @@ class BuildingButton extends SpriteGroupComponent<ButtonState>
     return toAbsoluteRect().contains(point.toOffset());
   }
 
+  @override
   bool onTapDown() {
     current = ButtonState.pressed;
     children.query<PositionComponent>().forEach((c) => c.position.y += 6);
@@ -101,12 +102,14 @@ class BuildingButton extends SpriteGroupComponent<ButtonState>
     return true;
   }
 
+  @override
   bool onTapUp() {
     current = ButtonState.unpressed;
     children.query<PositionComponent>().forEach((c) => c.position.y -= 6);
     return true;
   }
 
+  @override
   bool onTapCancel() {
     return onTapUp();
   }
