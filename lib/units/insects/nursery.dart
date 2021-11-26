@@ -4,22 +4,19 @@ import '../building.dart';
 
 class Nursery extends Building {
   static const int nurseryHp = 1000;
+  static const int nurseryCost = 10;
 
   Nursery({
     required Vector2 position,
     Vector2? size,
     int? priority,
   }) : super(
-          position: position,
           hp: nurseryHp,
+          cost: nurseryCost,
+          position: position,
           size: size,
           priority: priority,
         );
-
-  @override
-  String get movingAsset => '';
-  @override
-  String get idleAsset => '';
 
   @override
   Future<void> onLoad() async {

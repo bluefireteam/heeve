@@ -8,24 +8,22 @@ class Worker extends Unit {
 
   Worker({
     required Vector2 position,
-    Vector2? size,
-    int? priority,
   }) : super(
           position: position,
           hp: workerHp,
           speed: workerSpeed,
-          size: size,
-          priority: priority,
+          size: Vector2.all(50),
         );
-
-  @override
-  String get movingAsset => '';
-  @override
-  String get idleAsset => '';
 
   @override
   Future<void> onLoad() async {
     await super.onLoad();
-    // Sub classes should set up animation groups here
+    //addHitbox(HitboxRectangle(relation: Vector2(0.3, 0.7)));
   }
+
+  @override
+  String get moveAsset => 'heeves/worker.fa';
+
+  @override
+  String get idleAsset => 'heeves/worker.fa';
 }

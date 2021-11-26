@@ -4,6 +4,9 @@ import 'package:flame/components.dart';
 import 'package:flame/palette.dart';
 
 class Selector extends Component {
+  @override
+  int get priority => 5;
+
   static final _selectorPaint = Paint()
     ..color = BasicPalette.red.color
     ..style = PaintingStyle.stroke
@@ -21,6 +24,4 @@ class Selector extends Component {
 
     c.drawRect(start & (end - start), _selectorPaint);
   }
-
-  int get priorty => 10;
 }

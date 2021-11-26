@@ -12,6 +12,7 @@ dependencies:
   dartlin: ^0.6.1
   flame: ^1.0.0-releasecandidate.17
   flame_fire_atlas: ^1.0.0-rc2
+  a_star_algorithm: ^0.1.1
 
 dev_dependencies:
   flame_lint: ^0.0.1
@@ -24,5 +25,6 @@ environment:
 flutter:
   assets:
     - assets/images/
+    - assets/sprites/
     - assets/sprites/humans/
     - assets/sprites/heeves/
