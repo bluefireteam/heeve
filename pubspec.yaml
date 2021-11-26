@@ -10,9 +10,11 @@ dependencies:
     sdk: flutter
   equatable: ^2.0.3
   dartlin: ^0.6.1
-  flame: ^1.0.0-releasecandidate.17
+  flame: ^1.0.0-releasecandidate.18
   flame_fire_atlas: ^1.0.0-rc2
   a_star_algorithm: ^0.1.1
+  ordered_set: ^5.0.0
+  google_fonts: ^2.1.0
 
 dev_dependencies:
   flame_lint: ^0.0.1
@@ -28,3 +30,13 @@ flutter:
     - assets/sprites/
     - assets/sprites/humans/
     - assets/sprites/heeves/
+  fonts:
+    - family: Fredericka
+      fonts:
+        - asset: assets/fonts/FrederickatheGreat-Regular.ttf
+    - family: Sigmar
+      fonts:
+        - asset: assets/fonts/SigmarOne-Regular.ttf
+    - family: PressStart2P
+      fonts:
+        - asset: assets/fonts/PressStart2P-Regular.ttf
