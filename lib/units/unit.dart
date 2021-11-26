@@ -46,7 +46,7 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
           ),
           position: position,
           size: size,
-          anchor: anchor,
+          anchor: anchor ?? Anchor.bottomCenter,
           priority: priority ?? 2,
         );
 
@@ -147,7 +147,6 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
     final y = block.y;
     Block? nextBlock = block;
 
-    // TODO(spydon): Take map size into consideration
     for (;;) {
       if (map.validBlock(nextBlock)) {
         target = nextBlock;

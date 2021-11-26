@@ -7,11 +7,11 @@ import 'package:flame/sprite.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
-import 'building_button.dart';
 import 'map_generator.dart';
 import 'ordered_map_component.dart';
 import 'selector.dart';
 import 'side_bar.dart';
+import 'story_boxes/start_box.dart';
 import 'units/building.dart';
 import 'units/humans/infantry.dart';
 import 'units/insects/butterfly.dart';
@@ -38,7 +38,7 @@ class HeeveGame extends FlameGame
   Vector2 cameraDirection = Vector2.zero();
   List<Unit> selectedUnits = [];
   // To circumvent not being able to add `HasTappables`
-  final List<BuildingButton> tappableButtons = [];
+  final List<ButtonMethods> tappableButtons = [];
 
   final ValueNotifier<int> currencyNotifier = ValueNotifier<int>(0);
 
@@ -46,6 +46,7 @@ class HeeveGame extends FlameGame
   Future<void> onLoad() async {
     await super.onLoad();
     //debugMode = true;
+    add(StartBox());
 
     camera.speed = 5000;
     camera.viewport = FixedResolutionViewport(Vector2(800, 600));
@@ -97,8 +98,8 @@ class HeeveGame extends FlameGame
     if (building != null) {
       final block = map.getBlockRenderedAt(building.topLeftPosition);
       if (!map.occupiedBlocks.contains(block)) {
-        building.position = map.getBlockCenterPosition(block);
         building.size.scale(2);
+        map.addOnBlock(building, block);
         buildingComponent = null;
         currencyNotifier.value -= building.cost;
         building.changeParent(map);
@@ -137,7 +138,7 @@ class HeeveGame extends FlameGame
 
   @override
   void onTapCancel() {
-    tappableButtons.forEach((t) => t.onTapCancel());
+    //tappableButtons.forEach((t) => t.onTapCancel());
   }
 
   void clearBuildComponent() {
@@ -286,4 +287,10 @@ class HeeveGame extends FlameGame
 
     return KeyEventResult.handled;
   }
+}
+
+mixin ButtonMethods on PositionComponent {
+  bool onTapDown();
+  bool onTapUp();
+  bool onTapCancel();
 }

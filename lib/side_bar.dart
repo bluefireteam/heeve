@@ -1,9 +1,5 @@
-import 'dart:ui';
-
 import 'package:flame/components.dart';
 import 'package:flame/input.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 
 import 'building_button.dart';
 import 'currency_component.dart';
@@ -11,7 +7,7 @@ import 'heeve_game.dart';
 import 'units/humans/spaceship.dart';
 import 'units/insects/butterfly.dart';
 
-class SideBar extends RectangleComponent with HasGameRef<HeeveGame> {
+class SideBar extends NineTileBoxComponent with HasGameRef<HeeveGame> {
   @override
   bool isHud = true;
 
@@ -35,7 +31,13 @@ class SideBar extends RectangleComponent with HasGameRef<HeeveGame> {
   @override
   Future<void> onLoad() async {
     await super.onLoad();
-    paint = Paint()..color = Colors.blueGrey;
+    final nineTileBoxSprite = await gameRef.loadSprite('nine-box.png');
+    nineTileBox = NineTileBox(
+      nineTileBoxSprite,
+      tileSize: 8,
+      destTileSize: 18,
+    );
+    //paint = Paint()..color = Colors.blueGrey;
     add(
       IsometricTileMapComponent(
         gameRef.tileset,

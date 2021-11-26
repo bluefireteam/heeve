@@ -52,7 +52,7 @@ class OrderedMapComponent extends IsometricTileMapComponent {
   }
 
   bool addOnBlock(PositionComponent component, Block block) {
-    if (!occupiedBlocks.contains(block)) {
+    if (validBlock(block)) {
       gridChildren.add(component..position = getBlockCenterPosition(block));
       add(component);
       occupiedBlocks.add(block);

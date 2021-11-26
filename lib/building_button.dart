@@ -12,7 +12,7 @@ enum ButtonState {
 }
 
 class BuildingButton extends SpriteGroupComponent<ButtonState>
-    with HasGameRef<HeeveGame> {
+    with HasGameRef<HeeveGame>, ButtonMethods {
   final String filename;
   final Building Function() buildingComponentFunction;
   late final int cost;
