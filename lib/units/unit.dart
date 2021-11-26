@@ -166,7 +166,7 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
       width++;
       height++;
     }
-    return false;
+    //return false;
   }
 
   Set<Block> _blocksBetween(Block a, Block b) {

@@ -19,7 +19,8 @@ class OrderedMapComponent extends IsometricTileMapComponent {
     int cornerDistance(PositionComponent c) =>
         c.position.distanceToSquared(cornerPosition).floor();
     renderOrder = OrderedSet(
-        (c1, c2) => cornerDistance(c2).compareTo(cornerDistance(c1)));
+      (c1, c2) => cornerDistance(c2).compareTo(cornerDistance(c1)),
+    );
     children.register<PositionComponent>();
   }
 

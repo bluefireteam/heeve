@@ -6,10 +6,10 @@ import 'package:flame/input.dart';
 import 'package:flame/sprite.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:heeve/ordered_map_component.dart';
 
 import 'building_button.dart';
 import 'map_generator.dart';
+import 'ordered_map_component.dart';
 import 'selector.dart';
 import 'side_bar.dart';
 import 'units/building.dart';
