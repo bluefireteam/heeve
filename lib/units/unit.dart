@@ -21,7 +21,7 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
   final int speed;
 
   Block? target;
-  Block? occupyingBlock;
+  Block? reservedBlock;
 
   bool _selected = false;
   bool get selected => _selected;
@@ -138,14 +138,22 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
   bool containsBlock(Block block) => this.block == block;
 
   bool moveToBlock(final Block block) {
-    final occupiedBlocks = gameRef.occupiedBlocks;
+    final occupiedBlocks = gameRef.map.occupiedBlocks;
     var width = 1;
     var height = 1;
     final x = block.x;
     final y = block.y;
     Block? nextBlock = block;
 
-    while (nextBlock != null) {
+    // TODO(spydon): Take map size into consideration
+    for (;;) {
+      if (nextBlock != null && !occupiedBlocks.contains(nextBlock)) {
+        target = nextBlock;
+        occupiedBlocks.remove(reservedBlock);
+        occupiedBlocks.add(nextBlock);
+        reservedBlock = nextBlock;
+        return true;
+      }
       final topLeft = Block(x - width, y - height);
       final bottomRight = Block(x + width, y + height);
       final topRight = Block(bottomRight.x, topLeft.y);
@@ -155,13 +163,6 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
         ..addAll(_blocksBetween(bottomRight, bottomLeft))
         ..addAll(_blocksBetween(bottomLeft, topLeft));
       nextBlock = blocks.firstWhereOrNull((b) => !occupiedBlocks.contains(b));
-      if (nextBlock != null) {
-        target = nextBlock;
-        occupiedBlocks.remove(occupyingBlock);
-        occupiedBlocks.add(nextBlock);
-        occupyingBlock = nextBlock;
-        return true;
-      }
       width++;
       height++;
     }
