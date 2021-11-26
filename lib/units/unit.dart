@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'dart:ui';
 
+import 'package:collection/collection.dart';
 import 'package:flame/components.dart';
 import 'package:flame_fire_atlas/flame_fire_atlas.dart';
 
@@ -20,6 +21,7 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
   final int speed;
 
   Block? target;
+  Block? occupyingBlock;
 
   bool _selected = false;
   bool get selected => _selected;
@@ -90,7 +92,7 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
 
       final angle = direction.angleToSigned(Vector2(1, 0));
       current = UnitAnimationState.withDirection(
-        AnimationState.die,
+        AnimationState.move,
         angle,
       );
 
@@ -134,6 +136,51 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
   }
 
   bool containsBlock(Block block) => this.block == block;
+
+  bool moveToBlock(final Block block) {
+    final occupiedBlocks = gameRef.occupiedBlocks;
+    var width = 1;
+    var height = 1;
+    final x = block.x;
+    final y = block.y;
+    Block? nextBlock = block;
+
+    while (nextBlock != null) {
+      final topLeft = Block(x - width, y - height);
+      final bottomRight = Block(x + width, y + height);
+      final topRight = Block(bottomRight.x, topLeft.y);
+      final bottomLeft = Block(topLeft.x, bottomRight.y);
+      final blocks = _blocksBetween(topLeft, topRight)
+        ..addAll(_blocksBetween(topRight, bottomRight))
+        ..addAll(_blocksBetween(bottomRight, bottomLeft))
+        ..addAll(_blocksBetween(bottomLeft, topLeft));
+      nextBlock = blocks.firstWhereOrNull((b) => !occupiedBlocks.contains(b));
+      if (nextBlock != null) {
+        target = nextBlock;
+        occupiedBlocks.remove(occupyingBlock);
+        occupiedBlocks.add(nextBlock);
+        occupyingBlock = nextBlock;
+        return true;
+      }
+      width++;
+      height++;
+    }
+    return false;
+  }
+
+  Set<Block> _blocksBetween(Block a, Block b) {
+    final blocks = <Block>{};
+    final minX = min(a.x, b.x);
+    final maxX = max(a.x, b.x);
+    final minY = min(a.y, b.y);
+    final maxY = max(a.y, b.y);
+    for (var x = minX; x <= maxX; x++) {
+      for (var y = minY; y <= maxY; y++) {
+        blocks.add(Block(x, y));
+      }
+    }
+    return blocks;
+  }
 
   bool intersectsBlock(Block start, Block end) {
     final block = this.block;

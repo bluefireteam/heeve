@@ -104,6 +104,7 @@ class HeeveGame extends FlameGame
       final block = map.getBlockRenderedAt(building.topLeftPosition);
       if (!occupiedBlocks.contains(block)) {
         building.position = map.getBlockCenterPosition(block);
+        building.size.scale(2);
         buildingComponent = null;
         currencyNotifier.value -= building.cost;
       } else {
@@ -130,8 +131,8 @@ class HeeveGame extends FlameGame
 
     unselectAll();
 
-    final pos = details.eventPosition.game;
-    final block = map.getBlock(pos);
+    final position = details.eventPosition.game;
+    final block = map.getBlock(position);
 
     children
         .whereType<Unit>()
@@ -154,8 +155,11 @@ class HeeveGame extends FlameGame
     final position = details.eventPosition.game;
     final block = map.getBlock(position);
     selectedUnits.forEach((unit) {
-      unit.target = block;
+      unit.moveToBlock(block);
     });
+    //selectedUnits.forEach((unit) {
+    //  unit.add(RotateEffect(angle: 0.1, duration: 0.5, isAlternating: true));
+    //});
     clearBuildComponent();
   }
 
