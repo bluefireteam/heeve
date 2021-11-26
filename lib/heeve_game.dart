@@ -129,7 +129,7 @@ class HeeveGame extends FlameGame
     final position = details.eventPosition.game;
     final block = map.getBlock(position);
 
-    children
+    map.gridChildren
         .whereType<Unit>()
         .where((unit) => unit.containsBlock(block))
         .forEach(select);

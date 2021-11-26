@@ -7,6 +7,7 @@ import 'package:flame_fire_atlas/flame_fire_atlas.dart';
 
 import '../heeve_game.dart';
 import '../highlight.dart';
+import '../ordered_map_component.dart';
 import 'unit_animation_state.dart';
 
 /// A unit is anything that can be attacked and has different animations.
@@ -22,6 +23,7 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
 
   Block? target;
   Block? reservedBlock;
+  late final OrderedMapComponent map;
 
   bool _selected = false;
   bool get selected => _selected;
@@ -58,59 +60,15 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
 
   String _asset(String path) => 'sprites/$path';
 
-  Block get block => gameRef.map.getBlock(position);
+  Block get block => map.getBlock(position);
 
   Highlight get highlight => children.first as Highlight;
-
-  @override
-  void renderTree(Canvas canvas) {
-    canvas.save();
-    canvas.transform(transformMatrix.storage);
-
-    children.forEach((c) => c.renderTree(canvas));
-    render(canvas);
-
-    // Any debug rendering should be rendered on top of everything
-    if (debugMode) {
-      renderDebugMode(canvas);
-    }
-
-    canvas.restore();
-  }
-
-  @override
-  void update(double dt) {
-    super.update(dt);
-
-    highlight.position =
-        gameRef.map.getBlockRenderPosition(block) - topLeftPosition;
-
-    if (target != null) {
-      final targetBlockPosition = gameRef.map.getBlockCenterPosition(target!);
-      final direction = targetBlockPosition - position;
-      final step = speed * dt;
-
-      final angle = direction.angleToSigned(Vector2(1, 0));
-      current = UnitAnimationState.withDirection(
-        AnimationState.move,
-        angle,
-      );
-
-      if (direction.length < step) {
-        position = targetBlockPosition;
-        target = null;
-        current = current?.copyWithState(AnimationState.idle);
-      } else {
-        direction.scaleTo(step);
-        position += direction;
-      }
-    }
-  }
 
   @override
   Future<void> onLoad() async {
     await super.onLoad();
 
+    map = gameRef.map;
     animations = {};
 
     Future<void> createAnimationState(
@@ -135,10 +93,54 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
     await add(Highlight());
   }
 
+  @override
+  void renderTree(Canvas canvas) {
+    canvas.save();
+    canvas.transform(transformMatrix.storage);
+
+    children.forEach((c) => c.renderTree(canvas));
+    render(canvas);
+
+    // Any debug rendering should be rendered on top of everything
+    if (debugMode) {
+      renderDebugMode(canvas);
+    }
+
+    canvas.restore();
+  }
+
+  @override
+  void update(double dt) {
+    super.update(dt);
+
+    highlight.position = map.getBlockRenderPosition(block) - topLeftPosition;
+
+    if (target != null) {
+      final targetBlockPosition = map.getBlockCenterPosition(target!);
+      final direction = targetBlockPosition - position;
+      final step = speed * dt;
+
+      final angle = direction.angleToSigned(Vector2(1, 0));
+      current = UnitAnimationState.withDirection(
+        AnimationState.move,
+        angle,
+      );
+
+      if (direction.length < step) {
+        position = targetBlockPosition;
+        target = null;
+        current = current?.copyWithState(AnimationState.idle);
+      } else {
+        direction.scaleTo(step);
+        position += direction;
+      }
+    }
+  }
+
   bool containsBlock(Block block) => this.block == block;
 
   bool moveToBlock(final Block block) {
-    final occupiedBlocks = gameRef.map.occupiedBlocks;
+    final occupiedBlocks = map.occupiedBlocks;
     var width = 1;
     var height = 1;
     final x = block.x;
@@ -147,10 +149,10 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
 
     // TODO(spydon): Take map size into consideration
     for (;;) {
-      if (nextBlock != null && !occupiedBlocks.contains(nextBlock)) {
+      if (map.validBlock(nextBlock)) {
         target = nextBlock;
         occupiedBlocks.remove(reservedBlock);
-        occupiedBlocks.add(nextBlock);
+        occupiedBlocks.add(nextBlock!);
         reservedBlock = nextBlock;
         return true;
       }
@@ -162,7 +164,7 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
         ..addAll(_blocksBetween(topRight, bottomRight))
         ..addAll(_blocksBetween(bottomRight, bottomLeft))
         ..addAll(_blocksBetween(bottomLeft, topLeft));
-      nextBlock = blocks.firstWhereOrNull((b) => !occupiedBlocks.contains(b));
+      nextBlock = blocks.firstWhereOrNull(map.validBlock);
       width++;
       height++;
     }
