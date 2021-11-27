@@ -1,3 +1,4 @@
+import 'package:dartlin/dartlin.dart';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flame/game.dart';
@@ -14,6 +15,7 @@ import 'story_boxes/start_box.dart';
 import 'units/building.dart';
 import 'units/humans/infantry.dart';
 import 'units/insects/butterfly.dart';
+import 'units/insects/worker.dart';
 import 'units/unit.dart';
 
 class HeeveGame extends FlameGame
@@ -72,6 +74,7 @@ class HeeveGame extends FlameGame
     map.addOnBlock(Infantry(), const Block(13, 2));
     map.addOnBlock(Infantry(), const Block(3, 12));
     map.addOnBlock(Infantry(), const Block(5, 8));
+    map.addOnBlock(Worker(), const Block(2, 2));
     final butterflyBlocks = List<Block>.generate(
       10,
       //(i) => Block(i, i),
@@ -148,9 +151,20 @@ class HeeveGame extends FlameGame
   void onSecondaryTapUp(TapUpInfo details) {
     final position = details.eventPosition.game;
     final block = map.getBlock(position);
-    selectedUnits.forEach((unit) {
-      unit.moveToBlock(block);
-    });
+    final enemy = map.gridChildren
+        .whereType<Unit>()
+        .firstOrNull((it) => it.block == block);
+    if (enemy != null) {
+      selectedUnits.forEach((unit) {
+        if (unit != enemy) {
+          unit.attack(enemy);
+        }
+      });
+    } else {
+      selectedUnits.forEach((unit) {
+        unit.moveToBlock(block);
+      });
+    }
     clearBuildComponent();
   }
 

@@ -8,6 +8,8 @@ import 'package:flame_fire_atlas/flame_fire_atlas.dart';
 import '../heeve_game.dart';
 import '../highlight.dart';
 import '../ordered_map_component.dart';
+import '../projectile.dart';
+import 'life_bar.dart';
 import 'unit_animation_state.dart';
 
 /// A unit is anything that can be attacked and has different animations.
@@ -19,11 +21,15 @@ import 'unit_animation_state.dart';
 abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
     with HasHitboxes, Collidable, HasGameRef<HeeveGame> {
   final int hp;
+  double currentHp;
   final int speed;
 
   Block? target;
   Block? reservedBlock;
   late final OrderedMapComponent map;
+
+  Unit? attacking;
+  late final Timer shootingTimer;
 
   bool _selected = false;
   bool get selected => _selected;
@@ -39,7 +45,8 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
     Vector2? size,
     int? priority,
     Anchor? anchor,
-  }) : super(
+  })  : currentHp = hp.toDouble(),
+        super(
           current: const UnitAnimationState(
             animation: AnimationState.idle,
             direction: DirectionState.upLeft,
@@ -48,12 +55,19 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
           size: size,
           anchor: anchor ?? Anchor.bottomCenter,
           priority: priority ?? 2,
-        );
+        ) {
+    shootingTimer = Timer(1, repeat: true, onTick: shoot);
+  }
 
   String get moveAsset;
   String get idleAsset;
   String get dieAsset => idleAsset;
   String get attackAsset => idleAsset;
+
+  /// The exact point within the sprite where bullets should be shot/hit.
+  Vector2 get bulletPosition => position - Vector2(0, height / 2);
+
+  bool get isDead => currentHp <= 0;
 
   String _formatDirectionState(DirectionState state) =>
       state.toString().split('.')[1];
@@ -63,6 +77,8 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
   Block get block => map.getBlock(position);
 
   Highlight get highlight => children.first as Highlight;
+
+  bool get shouldRenderLifeBar => selected || currentHp < hp;
 
   @override
   Future<void> onLoad() async {
@@ -110,13 +126,26 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
   }
 
   @override
+  void render(Canvas canvas) {
+    super.render(canvas);
+
+    if (shouldRenderLifeBar) {
+      final dimensions = Vector2(size.x, 8);
+      final p = Vector2(0, -6);
+      LifeBar.render(canvas, p, dimensions, currentHp / hp);
+    }
+  }
+
+  @override
   void update(double dt) {
     super.update(dt);
 
     highlight.position = map.getBlockRenderPosition(block) - topLeftPosition;
 
+    final target = this.target;
+    final attacking = this.attacking;
     if (target != null) {
-      final targetBlockPosition = map.getBlockCenterPosition(target!);
+      final targetBlockPosition = map.getBlockCenterPosition(target);
       final direction = targetBlockPosition - position;
       final step = speed * dt;
 
@@ -128,18 +157,58 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
 
       if (direction.length < step) {
         position = targetBlockPosition;
-        target = null;
+        this.target = null;
         current = current?.copyWithState(AnimationState.idle);
       } else {
         direction.scaleTo(step);
         position += direction;
       }
+    } else if (attacking != null) {
+      if (attacking.isDead) {
+        this.attacking = null;
+      } else {
+        final direction = attacking.position - position;
+        final angle = direction.angleToSigned(Vector2(1, 0));
+        current = UnitAnimationState.withDirection(
+          AnimationState.attack,
+          angle,
+        );
+      }
     }
+
+    shootingTimer.update(dt);
   }
 
   bool containsBlock(Block block) => this.block == block;
 
+  void shoot() {
+    final enemy = attacking;
+    if (enemy == null) {
+      return;
+    }
+    gameRef.add(
+      Projectile(
+        speed: 100.0,
+        damage: 2.5,
+        src: bulletPosition,
+        target: enemy,
+      ),
+    );
+  }
+
+  void takeDamage(double damage) {
+    currentHp -= damage;
+    if (isDead) {
+      gameRef.map.removeUnit(this);
+    }
+  }
+
+  void attack(Unit enemy) {
+    attacking = enemy;
+  }
+
   bool moveToBlock(final Block block) {
+    attacking = null; // stop attacking
     final occupiedBlocks = map.occupiedBlocks;
     var width = 1;
     var height = 1;
@@ -167,7 +236,6 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
       width++;
       height++;
     }
-    //return false;
   }
 
   Set<Block> _blocksBetween(Block a, Block b) {

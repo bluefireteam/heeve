@@ -4,6 +4,8 @@ import 'package:flame/components.dart';
 import 'package:flame/sprite.dart';
 import 'package:ordered_set/ordered_set.dart';
 
+import 'units/unit.dart';
+
 class OrderedMapComponent extends IsometricTileMapComponent {
   late final Block corner;
   final List<Block> occupiedBlocks = [];
@@ -59,6 +61,12 @@ class OrderedMapComponent extends IsometricTileMapComponent {
       return true;
     }
     return false;
+  }
+
+  void removeUnit(Unit unit) {
+    occupiedBlocks.remove(unit.block);
+    gridChildren.remove(unit);
+    unit.removeFromParent();
   }
 
   bool validBlock(Block? block) {
