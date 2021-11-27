@@ -46,11 +46,11 @@ class HeeveGame extends FlameGame
   Future<void> onLoad() async {
     await super.onLoad();
     //debugMode = true;
-    add(StartBox());
 
     camera.speed = 5000;
     camera.viewport = FixedResolutionViewport(Vector2(800, 600));
 
+    add(StartBox());
     tileset = SpriteSheet(
       image: await images.load('tileset.png'),
       srcSize: Vector2.all(32.0),

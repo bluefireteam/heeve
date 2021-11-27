@@ -1,23 +1,15 @@
 import 'package:flame/components.dart';
+import 'package:flame/effects.dart';
 import 'package:flame/input.dart';
 import 'package:flutter/material.dart';
 
 import '../button_component.dart';
 import '../units/insects/worker.dart';
 import '../units/unit_animation_state.dart';
-import 'intro_box.dart';
 import 'story_box.dart';
 
-// This is shown before the story so that we can play the music meanwhile the
-// user reads on the next box.
-class StartBox extends StoryBox {
-  StartBox() : super(size: Vector2(300, 220));
-
-  @override
-  void onGameResize(Vector2 size) {
-    super.onGameResize(size);
-    print(size);
-  }
+class IntroBox extends StoryBox {
+  IntroBox() : super(size: Vector2(300, 220));
 
   @override
   Future<void> onLoad() async {
@@ -45,10 +37,6 @@ class StartBox extends StoryBox {
         color: Colors.grey, //476c4f
         fontSize: 14.0,
         fontFamily: 'PressStart2P',
-        //shadows: [
-        //  Shadow(offset: Offset(2, 2), blurRadius: 2),
-        //  Shadow(color: Colors.green, offset: Offset(2, 2), blurRadius: 4),
-        //],
       ),
     );
 
@@ -72,7 +60,7 @@ class StartBox extends StoryBox {
       srcSize: Vector2(34, 12.5),
     );
     final startText = TextComponent(
-      text: 'Start',
+      text: 'Go get them!',
       textRenderer: pixelStyle,
       position: Vector2(100, 15),
       anchor: Anchor.center,
@@ -87,10 +75,42 @@ class StartBox extends StoryBox {
       onPressed: () {
         startText.position.y += 6;
         removeFromParent();
-        gameRef.add(IntroBox());
       },
     )..add(startText);
     gameRef.tappableButtons.add(startButton);
-    add(startButton);
+    add(
+      startButton
+        ..add(
+          MoveEffect(
+            path: [Vector2(0, 180)],
+            duration: 0.7,
+            isRelative: true,
+            onComplete: startStory,
+          ),
+        ),
+    );
+    add(SizeEffect(size: Vector2(300, 400), duration: 0.5));
+  }
+
+  void startStory() {
+    final storyStyle = TextPaint(
+      style: const TextStyle(
+        color: Colors.black38,
+        fontSize: 12.0,
+        fontFamily: 'Sigmar',
+      ),
+    );
+
+    add(
+      TextBoxComponent(
+        text:
+            'Here Erick is going to write about who the insectoids are fighting and '
+            'why, and he will also write other good things probably, who knows?',
+        textRenderer: storyStyle,
+        boxConfig: TextBoxConfig(timePerChar: 0.081, maxWidth: 250),
+        position: Vector2(size.x / 2 + 20, 190),
+        anchor: Anchor.center,
+      ),
+    );
   }
 }
