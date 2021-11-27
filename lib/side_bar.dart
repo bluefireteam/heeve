@@ -37,7 +37,6 @@ class SideBar extends NineTileBoxComponent with HasGameRef<HeeveGame> {
       tileSize: 8,
       destTileSize: 18,
     );
-    //paint = Paint()..color = Colors.blueGrey;
     add(
       IsometricTileMapComponent(
         gameRef.tileset,

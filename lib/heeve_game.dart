@@ -10,7 +10,6 @@ import 'package:flutter/widgets.dart';
 import 'map_generator.dart';
 import 'ordered_map_component.dart';
 import 'selector.dart';
-import 'side_bar.dart';
 import 'story_boxes/start_box.dart';
 import 'units/building.dart';
 import 'units/humans/infantry.dart';
@@ -81,7 +80,6 @@ class HeeveGame extends FlameGame
     butterflyBlocks.forEach((block) => map.addOnBlock(Butterfly(), block));
 
     add(selector = Selector());
-    add(SideBar());
   }
 
   @override

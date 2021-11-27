@@ -39,10 +39,6 @@ class StartBox extends StoryBox {
         color: Colors.grey, //476c4f
         fontSize: 14.0,
         fontFamily: 'PressStart2P',
-        //shadows: [
-        //  Shadow(offset: Offset(2, 2), blurRadius: 2),
-        //  Shadow(color: Colors.green, offset: Offset(2, 2), blurRadius: 4),
-        //],
       ),
     );
 

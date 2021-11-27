@@ -4,6 +4,7 @@ import 'package:flame/input.dart';
 import 'package:flutter/material.dart';
 
 import '../button_component.dart';
+import '../side_bar.dart';
 import '../units/insects/worker.dart';
 import '../units/unit_animation_state.dart';
 import 'story_box.dart';
@@ -74,6 +75,7 @@ class IntroBox extends StoryBox {
       anchor: Anchor.center,
       onPressed: () {
         startText.position.y += 6;
+        gameRef.add(SideBar());
         removeFromParent();
       },
     )..add(startText);
