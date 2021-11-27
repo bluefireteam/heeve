@@ -14,12 +14,6 @@ class StartBox extends StoryBox {
   StartBox() : super(size: Vector2(300, 220));
 
   @override
-  void onGameResize(Vector2 size) {
-    super.onGameResize(size);
-    print(size);
-  }
-
-  @override
   Future<void> onLoad() async {
     await super.onLoad();
     final logo = Worker(position: Vector2(size.x / 2, 90));
