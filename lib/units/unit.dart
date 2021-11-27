@@ -69,6 +69,8 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
 
   bool get isDead => currentHp <= 0;
 
+  bool get selectable => !isDead;
+
   String _formatDirectionState(DirectionState state) =>
       state.toString().split('.')[1];
 
@@ -78,7 +80,7 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
 
   Highlight get highlight => children.first as Highlight;
 
-  bool get shouldRenderLifeBar => selected || currentHp < hp;
+  bool get shouldRenderLifeBar => !isDead && (selected || currentHp < hp);
 
   @override
   Future<void> onLoad() async {
@@ -138,6 +140,14 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
 
   @override
   void update(double dt) {
+    if (isDead) {
+      animation?.update(dt);
+      if (animation?.done() != false) {
+        gameRef.map.removeUnit(this);
+      }
+      return;
+    }
+
     super.update(dt);
 
     highlight.position = map.getBlockRenderPosition(block) - topLeftPosition;
@@ -199,7 +209,12 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
   void takeDamage(double damage) {
     currentHp -= damage;
     if (isDead) {
-      gameRef.map.removeUnit(this);
+      gameRef.unselectUnit(this);
+      current = UnitAnimationState(
+        animation: AnimationState.die,
+        direction: current?.direction ?? DirectionState.upLeft,
+      );
+      animation?.loop = false;
     }
   }
 

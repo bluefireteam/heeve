@@ -15,7 +15,7 @@ class LifeBar {
   ) {
     canvas.drawRect((p & size).inflate(0.5), _border);
     canvas.drawRect(p & size, _bg);
-    final fracSize = Vector2(size.x * fraction, size.y);
+    final fracSize = Vector2(size.x * fraction.clamp(0, 1), size.y);
     canvas.drawRect((p & fracSize).deflate(0.5), _bar);
   }
 }

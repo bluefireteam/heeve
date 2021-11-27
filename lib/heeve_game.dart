@@ -187,7 +187,10 @@ class HeeveGame extends FlameGame
     final end = selector.selectionEnd;
     if (start != null && end != null) {
       final selectionRect = Rect.fromPoints(start.toOffset(), end.toOffset());
-      map.children.whereType<Unit>().where((unit) {
+      map.children
+          .whereType<Unit>()
+          .where((unit) => unit.selectable)
+          .where((unit) {
         final p = map.getBlockCenterPosition(unit.block);
         return selectionRect.contains(p.toOffset());
       }).forEach(select);
@@ -205,6 +208,11 @@ class HeeveGame extends FlameGame
   void unselectAll() {
     selectedUnits.forEach((unit) => unit.selected = false);
     selectedUnits.clear();
+  }
+
+  void unselectUnit(Unit unit) {
+    selectedUnits.remove(unit);
+    unit.selected = false;
   }
 
   void select(Unit unit) {
