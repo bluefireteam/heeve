@@ -12,7 +12,6 @@ class Highlight extends SpriteComponent with HasGameRef<HeeveGame> {
     await super.onLoad();
     sprite = gameRef.tileset.getSprite(3, 3);
     size = sprite!.srcSize;
-    //anchor = Anchor.;
   }
 
   @override

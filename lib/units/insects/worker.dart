@@ -7,7 +7,7 @@ class Worker extends Unit {
   static const int workerSpeed = 10;
 
   Worker({
-    required Vector2 position,
+    Vector2? position,
   }) : super(
           position: position,
           hp: workerHp,
