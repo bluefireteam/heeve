@@ -42,14 +42,16 @@ class LoadingScreen extends FlameGame {
       ),
     );
 
-    add(TextComponent(
-      text: 'Made with Flame',
-      textRenderer: pixelStyle,
-      position: (size / 2)
-        ..y += 140
-        ..x += 13,
-      anchor: Anchor.center,
-      priority: 1,
-    ));
+    add(
+      TextComponent(
+        text: 'Made with Flame',
+        textRenderer: pixelStyle,
+        position: (size / 2)
+          ..y += 140
+          ..x += 13,
+        anchor: Anchor.center,
+        priority: 1,
+      ),
+    );
   }
 }
