@@ -10,7 +10,7 @@ import 'units/unit.dart';
 
 class OrderedMapComponent extends IsometricTileMapComponent {
   static Random rng = Random();
-  final List<Block> occupiedBlocks = [];
+  final Set<Block> occupiedBlocks = {};
   late final OrderedSet<PositionComponent> gridChildren;
   late final int maxX;
   late final int maxY;

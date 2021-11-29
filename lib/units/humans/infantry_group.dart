@@ -14,7 +14,7 @@ class InfantryGroup extends Component with HasGameRef<HeeveGame> {
   void update(double dt) {
     super.update(dt);
     timeSinceUpdate += dt;
-    if (timeSinceUpdate > 10) {
+    if (timeSinceUpdate > 5) {
       if (units.isEmpty) {
         if (groupTarget != null) {
           gameRef.map.occupiedBlocks.remove(groupTarget!);
