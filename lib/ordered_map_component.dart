@@ -7,7 +7,6 @@ import 'package:ordered_set/ordered_set.dart';
 import 'units/unit.dart';
 
 class OrderedMapComponent extends IsometricTileMapComponent {
-  late final Block corner;
   final List<Block> occupiedBlocks = [];
   late final OrderedSet<PositionComponent> gridChildren;
   late final int maxX;
@@ -20,14 +19,22 @@ class OrderedMapComponent extends IsometricTileMapComponent {
   }) : super(tileset, matrix, tileHeight: tileHeight) {
     maxX = matrix.length;
     maxY = matrix.first.length;
-    corner = Block(matrix.length, matrix.first.length);
-    final cornerPosition = getBlockRenderPosition(corner);
+    final cornerPosition = getBlockRenderPosition(Block(maxX, maxY));
     int cornerDistance(PositionComponent c) =>
         c.position.distanceToSquared(cornerPosition).floor();
     gridChildren = OrderedSet(
       (c1, c2) => cornerDistance(c2).compareTo(cornerDistance(c1)),
     );
     children.register<PositionComponent>();
+
+    // Add empty tiles to occupiedBlocks so that units can't stand on them
+    for (var x = 0; x < matrix.length; x++) {
+      for (var y = 0; y < matrix.first.length; y++) {
+        if (matrix[x][y] == 4) {
+          occupiedBlocks.add(Block(y, x));
+        }
+      }
+    }
   }
 
   @override
@@ -56,8 +63,11 @@ class OrderedMapComponent extends IsometricTileMapComponent {
   bool addOnBlock(PositionComponent component, Block block) {
     if (validBlock(block)) {
       gridChildren.add(component..position = getBlockCenterPosition(block));
-      add(component);
+      if (component is Unit) {
+        component.reservedBlock = block;
+      }
       occupiedBlocks.add(block);
+      add(component);
       return true;
     }
     return false;

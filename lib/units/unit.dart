@@ -1,8 +1,12 @@
+import 'dart:collection';
 import 'dart:math';
 import 'dart:ui';
 
+import 'package:a_star_algorithm/a_star_algorithm.dart';
 import 'package:collection/collection.dart';
 import 'package:flame/components.dart';
+import 'package:flame/effects.dart';
+import 'package:flame/extensions.dart';
 import 'package:flame_fire_atlas/flame_fire_atlas.dart';
 
 import '../heeve_game.dart';
@@ -26,6 +30,7 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
 
   Block? target;
   Block? reservedBlock;
+  final Queue<Block> path = Queue();
   late final OrderedMapComponent map;
 
   Unit? attacking;
@@ -152,10 +157,9 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
 
     highlight.position = map.getBlockRenderPosition(block) - topLeftPosition;
 
-    final target = this.target;
     final attacking = this.attacking;
-    if (target != null) {
-      final targetBlockPosition = map.getBlockCenterPosition(target);
+    if (path.isNotEmpty) {
+      final targetBlockPosition = map.getBlockCenterPosition(path.first);
       final direction = targetBlockPosition - position;
       final step = speed * dt;
 
@@ -167,7 +171,7 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
 
       if (direction.length < step) {
         position = targetBlockPosition;
-        this.target = null;
+        path.removeFirst();
         current = current?.copyWithState(AnimationState.idle);
       } else {
         direction.scaleTo(step);
@@ -176,6 +180,10 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
     } else if (attacking != null) {
       if (attacking.isDead) {
         this.attacking = null;
+        current = UnitAnimationState.withDirection(
+          AnimationState.idle,
+          angle,
+        );
       } else {
         final direction = attacking.position - position;
         final angle = direction.angleToSigned(Vector2(1, 0));
@@ -222,35 +230,59 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
     attacking = enemy;
   }
 
-  bool moveToBlock(final Block block) {
+  void moveToBlock(final Block block) {
     attacking = null; // stop attacking
     final occupiedBlocks = map.occupiedBlocks;
     var width = 1;
     var height = 1;
     final x = block.x;
     final y = block.y;
+    final currentBlock = this.block;
+    final startingOffset = Offset(
+      currentBlock.x.toDouble(),
+      currentBlock.y.toDouble(),
+    );
     Block? nextBlock = block;
+    var foundTarget = false;
 
-    for (;;) {
+    while (!foundTarget) {
       if (map.validBlock(nextBlock)) {
-        target = nextBlock;
         occupiedBlocks.remove(reservedBlock);
-        occupiedBlocks.add(nextBlock!);
-        reservedBlock = nextBlock;
-        return true;
+        target = reservedBlock = nextBlock;
+        foundTarget = true;
+      } else {
+        final topLeft = Block(x - width, y - height);
+        final bottomRight = Block(x + width, y + height);
+        final topRight = Block(bottomRight.x, topLeft.y);
+        final bottomLeft = Block(topLeft.x, bottomRight.y);
+        final blocks = _blocksBetween(topLeft, topRight)
+          ..addAll(_blocksBetween(topRight, bottomRight))
+          ..addAll(_blocksBetween(bottomRight, bottomLeft))
+          ..addAll(_blocksBetween(bottomLeft, topLeft));
+        nextBlock = blocks.firstWhereOrNull(map.validBlock);
+        width++;
+        height++;
       }
-      final topLeft = Block(x - width, y - height);
-      final bottomRight = Block(x + width, y + height);
-      final topRight = Block(bottomRight.x, topLeft.y);
-      final bottomLeft = Block(topLeft.x, bottomRight.y);
-      final blocks = _blocksBetween(topLeft, topRight)
-        ..addAll(_blocksBetween(topRight, bottomRight))
-        ..addAll(_blocksBetween(bottomRight, bottomLeft))
-        ..addAll(_blocksBetween(bottomLeft, topLeft));
-      nextBlock = blocks.firstWhereOrNull(map.validBlock);
-      width++;
-      height++;
     }
+
+    path.clear();
+    path.addAll(
+      AStar(
+        rows: map.matrix.length,
+        columns: map.matrix.first.length,
+        start: startingOffset,
+        end: Offset(target!.x.toDouble(), target!.y.toDouble()),
+        barriers: map.occupiedBlocks
+            .map((b) => Offset(b.x.toDouble(), b.y.toDouble()))
+            .toList(growable: false),
+      )
+          .findThePath()
+          .map((b) => Block(b.dx.toInt(), b.dy.toInt()))
+          .toList(growable: false)
+          .reversed,
+    );
+    path.add(target!);
+    occupiedBlocks.add(target!);
   }
 
   Set<Block> _blocksBetween(Block a, Block b) {

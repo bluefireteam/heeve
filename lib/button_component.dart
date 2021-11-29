@@ -1,21 +1,22 @@
 import 'package:flame/components.dart';
 import 'package:flame/input.dart';
-
-import 'heeve_game.dart';
+import 'package:flutter/cupertino.dart';
 
 enum ButtonState {
   up,
   down,
 }
 
-class ButtonComponent extends SpriteGroupComponent<ButtonState>
-    with ButtonMethods {
+class ButtonComponent extends SpriteGroupComponent<ButtonState> {
   /// Callback for what should happen when the button is pressed.
   void Function()? onPressed;
 
+  Sprite? button;
+  Sprite? buttonDown;
+
   ButtonComponent({
-    required Sprite button,
-    required Sprite buttonDown,
+    this.button,
+    this.buttonDown,
     this.onPressed,
     Vector2? position,
     Vector2? size,
@@ -26,34 +27,46 @@ class ButtonComponent extends SpriteGroupComponent<ButtonState>
   }) : super(
           current: ButtonState.up,
           position: position,
-          size: size ?? button.originalSize,
+          size: size ?? button?.originalSize,
           scale: scale,
           angle: angle,
           anchor: anchor,
           priority: priority,
         ) {
-    sprites = {
-      ButtonState.up: button,
-      ButtonState.down: buttonDown,
-    };
+    children.register<PositionComponent>();
   }
 
   @override
+  void onMount() {
+    assert(
+      button != null && buttonDown != null,
+      'button and buttonDown has to be initialized',
+    );
+    sprites = {
+      ButtonState.up: button!,
+      ButtonState.down: buttonDown!,
+    };
+    super.onMount();
+  }
+
+  @mustCallSuper
   bool onTapDown() {
     current = ButtonState.down;
+    children.query<PositionComponent>().forEach((c) => c.position.y += 6);
     return false;
   }
 
-  @override
+  @mustCallSuper
   bool onTapUp() {
-    current = ButtonState.down;
     onPressed?.call();
+    onTapCancel();
     return false;
   }
 
-  @override
+  @mustCallSuper
   bool onTapCancel() {
-    onTapUp();
+    current = ButtonState.up;
+    children.query<PositionComponent>().forEach((c) => c.position.y -= 6);
     return false;
   }
 }

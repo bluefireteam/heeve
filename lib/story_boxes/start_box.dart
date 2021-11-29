@@ -8,7 +8,7 @@ import '../units/unit_animation_state.dart';
 import 'intro_box.dart';
 import 'story_box.dart';
 
-// This is shown before the story so that we can play the music meanwhile the
+// This is shown before the story so that we can play the audio meanwhile the
 // user reads on the next box.
 class StartBox extends StoryBox {
   StartBox() : super(size: Vector2(300, 220));
@@ -75,9 +75,9 @@ class StartBox extends StoryBox {
       size: Vector2(200, 40),
       anchor: Anchor.center,
       onPressed: () {
-        startText.position.y += 6;
         removeFromParent();
         gameRef.add(IntroBox());
+        //FlameAudio.bgm.play('intro.mp3');
       },
     )..add(startText);
     gameRef.tappableButtons.add(startButton);

@@ -5,9 +5,11 @@ import 'package:flame/game.dart';
 import 'package:flame/image_composition.dart';
 import 'package:flame/input.dart';
 import 'package:flame/sprite.dart';
+import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
+import 'button_component.dart';
 import 'map_generator.dart';
 import 'ordered_map_component.dart';
 import 'selector.dart';
@@ -39,13 +41,19 @@ class HeeveGame extends FlameGame
   Vector2 cameraDirection = Vector2.zero();
   List<Unit> selectedUnits = [];
   // To circumvent not being able to add `HasTappables`
-  final List<ButtonMethods> tappableButtons = [];
+  final List<ButtonComponent> tappableButtons = [];
 
   final ValueNotifier<int> currencyNotifier = ValueNotifier<int>(0);
 
   @override
   Future<void> onLoad() async {
     await super.onLoad();
+    await FlameAudio.audioCache.loadAll([
+      'intro.mp3',
+      'battle.mp3',
+      'sci-fi.mp3',
+    ]);
+    await Future<void>.delayed(const Duration(seconds: 3));
     //debugMode = true;
 
     camera.speed = 5000;
@@ -57,6 +65,7 @@ class HeeveGame extends FlameGame
       srcSize: Vector2.all(32.0),
     );
     matrix = MapGenerator.generateMap();
+
     add(map = OrderedMapComponent(tileset, matrix, tileHeight: 8));
     final mapWidth = map.matrix.length;
     final mapHeight = map.matrix.first.length;
@@ -139,7 +148,7 @@ class HeeveGame extends FlameGame
 
   @override
   void onTapCancel() {
-    //tappableButtons.forEach((t) => t.onTapCancel());
+    tappableButtons.forEach((t) => t.onTapCancel());
   }
 
   void clearBuildComponent() {
@@ -307,10 +316,4 @@ class HeeveGame extends FlameGame
 
     return KeyEventResult.handled;
   }
-}
-
-mixin ButtonMethods on PositionComponent {
-  bool onTapDown();
-  bool onTapUp();
-  bool onTapCancel();
 }
