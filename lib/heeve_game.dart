@@ -8,7 +8,6 @@ import 'package:flame/sprite.dart';
 import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:heeve/units/insects/ore.dart';
 
 import 'button_component.dart';
 import 'map_generator.dart';
@@ -19,6 +18,7 @@ import 'units/building.dart';
 import 'units/humans/infantry.dart';
 import 'units/humans/infantry_group.dart';
 import 'units/insects/butterfly.dart';
+import 'units/insects/ore.dart';
 import 'units/insects/worker.dart';
 import 'units/unit.dart';
 
