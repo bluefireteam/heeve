@@ -256,7 +256,7 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
           .reversed,
     );
     path.add(target!);
-    occupiedBlocks.add(target!);
+    occupiedBlocks.add(reservedBlock!);
   }
 
   bool intersectsBlock(Block start, Block end) {

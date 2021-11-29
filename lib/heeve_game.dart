@@ -79,10 +79,16 @@ class HeeveGame extends FlameGame
       ),
     );
 
-    final infantryGroup = InfantryGroup(List.generate(5, (_) => Infantry()));
-    infantryGroup.units.forEach((u) => map.addOnBlock(u, map.randomBlock()));
+    final infantryGroups = List.generate(
+      3,
+      (_) => InfantryGroup(List.generate(5, (_) => Infantry())),
+    );
+    infantryGroups.forEach(
+      (group) =>
+          group.units.forEach((u) => map.addOnBlock(u, map.randomBlock())),
+    );
 
-    add(infantryGroup);
+    addAll(infantryGroups);
     map.addOnBlock(Worker(), const Block(2, 2));
     map.addOnBlock(Ore(), map.randomBlock());
     map.addOnBlock(Ore(), map.randomBlock());

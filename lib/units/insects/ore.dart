@@ -21,6 +21,7 @@ class Ore extends SpriteGroupComponent<OreState> with HasGameRef<HeeveGame> {
           position: position,
           size: Vector2.all(50),
           anchor: Anchor.bottomCenter,
+          priority: 1,
         );
 
   @override
