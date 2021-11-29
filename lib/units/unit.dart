@@ -3,7 +3,6 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:a_star_algorithm/a_star_algorithm.dart';
-import 'package:collection/collection.dart';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flame/extensions.dart';
@@ -31,7 +30,7 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
   Block? target;
   Block? reservedBlock;
   final Queue<Block> path = Queue();
-  late final OrderedMapComponent map;
+  OrderedMapComponent get map => gameRef.map;
 
   Unit? attacking;
   late final Timer shootingTimer;
@@ -91,7 +90,6 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
   Future<void> onLoad() async {
     await super.onLoad();
 
-    map = gameRef.map;
     animations = {};
 
     Future<void> createAnimationState(
@@ -233,37 +231,13 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
   void moveToBlock(final Block block) {
     attacking = null; // stop attacking
     final occupiedBlocks = map.occupiedBlocks;
-    var width = 1;
-    var height = 1;
-    final x = block.x;
-    final y = block.y;
     final currentBlock = this.block;
     final startingOffset = Offset(
       currentBlock.x.toDouble(),
       currentBlock.y.toDouble(),
     );
-    Block? nextBlock = block;
-    var foundTarget = false;
-
-    while (!foundTarget) {
-      if (map.validBlock(nextBlock)) {
-        occupiedBlocks.remove(reservedBlock);
-        target = reservedBlock = nextBlock;
-        foundTarget = true;
-      } else {
-        final topLeft = Block(x - width, y - height);
-        final bottomRight = Block(x + width, y + height);
-        final topRight = Block(bottomRight.x, topLeft.y);
-        final bottomLeft = Block(topLeft.x, bottomRight.y);
-        final blocks = _blocksBetween(topLeft, topRight)
-          ..addAll(_blocksBetween(topRight, bottomRight))
-          ..addAll(_blocksBetween(bottomRight, bottomLeft))
-          ..addAll(_blocksBetween(bottomLeft, topLeft));
-        nextBlock = blocks.firstWhereOrNull(map.validBlock);
-        width++;
-        height++;
-      }
-    }
+    occupiedBlocks.remove(reservedBlock);
+    target = reservedBlock = map.findCloseValidBlock(block);
 
     path.clear();
     path.addAll(
@@ -283,20 +257,6 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
     );
     path.add(target!);
     occupiedBlocks.add(target!);
-  }
-
-  Set<Block> _blocksBetween(Block a, Block b) {
-    final blocks = <Block>{};
-    final minX = min(a.x, b.x);
-    final maxX = max(a.x, b.x);
-    final minY = min(a.y, b.y);
-    final maxY = max(a.y, b.y);
-    for (var x = minX; x <= maxX; x++) {
-      for (var y = minY; y <= maxY; y++) {
-        blocks.add(Block(x, y));
-      }
-    }
-    return blocks;
   }
 
   bool intersectsBlock(Block start, Block end) {

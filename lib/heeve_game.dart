@@ -8,6 +8,7 @@ import 'package:flame/sprite.dart';
 import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:heeve/units/insects/ore.dart';
 
 import 'button_component.dart';
 import 'map_generator.dart';
@@ -16,6 +17,7 @@ import 'selector.dart';
 import 'story_boxes/start_box.dart';
 import 'units/building.dart';
 import 'units/humans/infantry.dart';
+import 'units/humans/infantry_group.dart';
 import 'units/insects/butterfly.dart';
 import 'units/insects/worker.dart';
 import 'units/unit.dart';
@@ -54,7 +56,6 @@ class HeeveGame extends FlameGame
       'sci-fi.mp3',
     ]);
     await Future<void>.delayed(const Duration(seconds: 3));
-    //debugMode = true;
 
     camera.speed = 5000;
     camera.viewport = FixedResolutionViewport(Vector2(800, 600));
@@ -66,7 +67,7 @@ class HeeveGame extends FlameGame
     );
     matrix = MapGenerator.generateMap();
 
-    add(map = OrderedMapComponent(tileset, matrix, tileHeight: 8));
+    await add(map = OrderedMapComponent(tileset, matrix, tileHeight: 8));
     final mapWidth = map.matrix.length;
     final mapHeight = map.matrix.first.length;
     camera.followVector2(
@@ -78,12 +79,15 @@ class HeeveGame extends FlameGame
       ),
     );
 
-    map.addOnBlock(Infantry(), const Block(0, 0));
-    map.addOnBlock(Infantry(), const Block(3, 8));
-    map.addOnBlock(Infantry(), const Block(13, 2));
-    map.addOnBlock(Infantry(), const Block(3, 12));
-    map.addOnBlock(Infantry(), const Block(5, 8));
+    final infantryGroup = InfantryGroup(List.generate(5, (_) => Infantry()));
+    infantryGroup.units.forEach((u) => map.addOnBlock(u, map.randomBlock()));
+
+    add(infantryGroup);
     map.addOnBlock(Worker(), const Block(2, 2));
+    map.addOnBlock(Ore(), map.randomBlock());
+    map.addOnBlock(Ore(), map.randomBlock());
+    map.addOnBlock(Ore(), map.randomBlock());
+    map.addOnBlock(Ore(), map.randomBlock());
     final butterflyBlocks = List<Block>.generate(
       10,
       //(i) => Block(i, i),
