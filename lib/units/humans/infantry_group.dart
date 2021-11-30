@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:math';
 
 import 'package:flame/components.dart';
@@ -43,11 +44,14 @@ class InfantryGroup extends Component with HasGameRef<HeeveGame> {
       groupTarget = gameRef.map.randomEdgeBlock();
       groupTargetPosition = gameRef.map.getBlockCenterPosition(groupTarget!);
       gameRef.map.occupiedBlocks.add(groupTarget!);
+      Queue<Block>? commonPath;
       units.forEach((u) {
         if (u.isDead) {
           units.remove(u);
+        } else if (commonPath == null) {
+          commonPath = u.moveToBlock(groupTarget!);
         } else {
-          u.moveToBlock(groupTarget!);
+          u.moveToBlock(groupTarget!, withPath: commonPath);
         }
       });
       timeSinceUpdate = 0;

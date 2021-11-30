@@ -29,7 +29,7 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
 
   Block? target;
   Block? reservedBlock;
-  final Queue<Block> path = Queue();
+  Queue<Block> path = Queue();
   OrderedMapComponent get map => gameRef.map;
 
   Unit? attacking;
@@ -228,35 +228,49 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
     attacking = enemy;
   }
 
-  void moveToBlock(final Block block) {
+  Queue<Block> moveToBlock(
+    final Block targetBlock, {
+    Queue<Block>? withPath,
+  }) {
     attacking = null; // stop attacking
     final occupiedBlocks = map.occupiedBlocks;
-    final currentBlock = this.block;
-    final startingOffset = Offset(
-      currentBlock.x.toDouble(),
-      currentBlock.y.toDouble(),
-    );
+    final currentBlock = block;
     occupiedBlocks.remove(reservedBlock);
-    target = reservedBlock = map.findCloseValidBlock(block);
+    target = reservedBlock = map.findCloseValidBlock(targetBlock);
 
-    path.clear();
-    path.addAll(
-      AStar(
-        rows: map.matrix.length,
-        columns: map.matrix.first.length,
-        start: startingOffset,
-        end: Offset(target!.x.toDouble(), target!.y.toDouble()),
-        barriers: map.occupiedBlocks
-            .map((b) => Offset(b.x.toDouble(), b.y.toDouble()))
-            .toList(growable: false),
-      )
-          .findThePath()
-          .map((b) => Block(b.dx.toInt(), b.dy.toInt()))
-          .toList(growable: false)
-          .reversed,
+    path = //withPath ??
+        generatePath(
+      currentBlock,
+      target!,
+      map.matrix,
+      map.occupiedBlocks,
     );
     path.add(target!);
     occupiedBlocks.add(reservedBlock!);
+    return path;
+  }
+
+  static Queue<Block> generatePath(
+    Block startingBlock,
+    Block target,
+    List<List<int>> matrix,
+    Set<Block> occupiedBlocks,
+  ) {
+    final path = Queue<Block>();
+    final offsetPath = AStar(
+      rows: matrix.length,
+      columns: matrix.first.length,
+      start: Offset(
+        startingBlock.x.toDouble(),
+        startingBlock.y.toDouble(),
+      ),
+      end: Offset(target.x.toDouble(), target.y.toDouble()),
+      barriers: occupiedBlocks
+          .map((b) => Offset(b.x.toDouble(), b.y.toDouble()))
+          .toList(growable: false),
+    ).findThePath();
+    offsetPath.forEach((o) => path.addFirst(Block(o.dx.toInt(), o.dy.toInt())));
+    return path;
   }
 
   bool intersectsBlock(Block start, Block end) {
