@@ -1,8 +1,13 @@
 import 'package:flame/components.dart';
 
-abstract class Building extends SpriteComponent with HasGameRef {
+import '../heeve_game.dart';
+import '../ordered_map_component.dart';
+
+abstract class Building extends SpriteComponent with HasGameRef<HeeveGame> {
   final int cost;
   final int hp;
+  Block get block => gameRef.map.getBlock(position);
+  bool get isActive => parent is OrderedMapComponent;
 
   Building({
     required this.hp,

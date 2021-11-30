@@ -13,6 +13,7 @@ class Worker extends Unit {
           hp: workerHp,
           speed: workerSpeed,
           size: Vector2.all(50),
+          anchor: const Anchor(0.5, 0.75),
         );
 
   @override
@@ -25,5 +26,5 @@ class Worker extends Unit {
   String get moveAsset => 'heeves/worker.fa';
 
   @override
-  String get idleAsset => 'heeves/worker.fa';
+  String get idleAsset => 'heeves/worker-idle.fa';
 }

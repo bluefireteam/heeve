@@ -68,16 +68,7 @@ class HeeveGame extends FlameGame
     matrix = MapGenerator.generateMap();
 
     await add(map = OrderedMapComponent(tileset, matrix, tileHeight: 8));
-    final mapWidth = map.matrix.length;
-    final mapHeight = map.matrix.first.length;
-    camera.followVector2(
-      map.getBlockCenterPosition(
-        Block(
-          (mapWidth / 2).floor(),
-          (mapHeight / 2).floor(),
-        ),
-      ),
-    );
+    centerMap();
 
     final infantryGroups = List.generate(
       3,
@@ -110,6 +101,17 @@ class HeeveGame extends FlameGame
 
     camera.translateBy(cameraDirection * cameraMovementSpeed * dt);
     camera.snap();
+  }
+
+  void centerMap() {
+    camera.followVector2(
+      map.getBlockCenterPosition(
+        Block(
+          (map.width / 2).floor(),
+          (map.height / 2).floor(),
+        ),
+      ),
+    );
   }
 
   @override
@@ -282,12 +284,15 @@ class HeeveGame extends FlameGame
     final d = LogicalKeyboardKey.keyD;
     final e = LogicalKeyboardKey.keyE;
     final q = LogicalKeyboardKey.keyQ;
+    final z = LogicalKeyboardKey.keyZ;
     final move = cameraDirection;
 
     if (event.logicalKey == e && isDown) {
       camera.zoom *= 2;
     } else if (event.logicalKey == q && isDown) {
       camera.zoom /= 2;
+    } else if (event.logicalKey == z && isDown) {
+      centerMap();
     }
 
     if (event.logicalKey == w) {

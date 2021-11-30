@@ -220,6 +220,16 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
         animation: AnimationState.die,
         direction: current?.direction ?? DirectionState.upLeft,
       );
+      if (dieAsset == idleAsset) {
+        print('tries to die');
+        add(
+          SizeEffect(
+            size: Vector2.zero(),
+            duration: 1,
+            onComplete: removeFromParent,
+          ),
+        );
+      }
       animation?.loop = false;
     }
   }
@@ -268,6 +278,7 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
       barriers: occupiedBlocks
           .map((b) => Offset(b.x.toDouble(), b.y.toDouble()))
           .toList(growable: false),
+      //withDiagonal: false,
     ).findThePath();
     offsetPath.forEach((o) => path.addFirst(Block(o.dx.toInt(), o.dy.toInt())));
     return path;

@@ -38,6 +38,7 @@ class BuildingButton extends ButtonComponent with HasGameRef<HeeveGame> {
 
     final buildingComponent = buildingComponentFunction()
       ..position = (BuildingButton.defaultSize / 2)
+      ..size = Vector2.all(35)
       ..y -= 6
       ..anchor = Anchor.center;
     add(buildingComponent);
