@@ -5,16 +5,20 @@ import 'package:flame/game.dart';
 import 'package:flame/image_composition.dart';
 import 'package:flame/input.dart';
 import 'package:flame/sprite.dart';
+import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
+import 'button_component.dart';
 import 'map_generator.dart';
 import 'ordered_map_component.dart';
 import 'selector.dart';
 import 'story_boxes/start_box.dart';
 import 'units/building.dart';
 import 'units/humans/infantry.dart';
+import 'units/humans/infantry_group.dart';
 import 'units/insects/butterfly.dart';
+import 'units/insects/ore.dart';
 import 'units/insects/worker.dart';
 import 'units/unit.dart';
 
@@ -39,14 +43,19 @@ class HeeveGame extends FlameGame
   Vector2 cameraDirection = Vector2.zero();
   List<Unit> selectedUnits = [];
   // To circumvent not being able to add `HasTappables`
-  final List<ButtonMethods> tappableButtons = [];
+  final List<ButtonComponent> tappableButtons = [];
 
   final ValueNotifier<int> currencyNotifier = ValueNotifier<int>(0);
 
   @override
   Future<void> onLoad() async {
     await super.onLoad();
-    //debugMode = true;
+    await FlameAudio.audioCache.loadAll([
+      'intro.mp3',
+      'battle.mp3',
+      'sci-fi.mp3',
+    ]);
+    await Future<void>.delayed(const Duration(seconds: 3));
 
     camera.speed = 5000;
     camera.viewport = FixedResolutionViewport(Vector2(800, 600));
@@ -57,7 +66,8 @@ class HeeveGame extends FlameGame
       srcSize: Vector2.all(32.0),
     );
     matrix = MapGenerator.generateMap();
-    add(map = OrderedMapComponent(tileset, matrix, tileHeight: 8));
+
+    await add(map = OrderedMapComponent(tileset, matrix, tileHeight: 8));
     final mapWidth = map.matrix.length;
     final mapHeight = map.matrix.first.length;
     camera.followVector2(
@@ -69,12 +79,21 @@ class HeeveGame extends FlameGame
       ),
     );
 
-    map.addOnBlock(Infantry(), const Block(0, 0));
-    map.addOnBlock(Infantry(), const Block(3, 8));
-    map.addOnBlock(Infantry(), const Block(13, 2));
-    map.addOnBlock(Infantry(), const Block(3, 12));
-    map.addOnBlock(Infantry(), const Block(5, 8));
+    final infantryGroups = List.generate(
+      3,
+      (_) => InfantryGroup(List.generate(5, (_) => Infantry())),
+    );
+    infantryGroups.forEach(
+      (group) =>
+          group.units.forEach((u) => map.addOnBlock(u, map.randomBlock())),
+    );
+
+    addAll(infantryGroups);
     map.addOnBlock(Worker(), const Block(2, 2));
+    map.addOnBlock(Ore(), map.randomBlock());
+    map.addOnBlock(Ore(), map.randomBlock());
+    map.addOnBlock(Ore(), map.randomBlock());
+    map.addOnBlock(Ore(), map.randomBlock());
     final butterflyBlocks = List<Block>.generate(
       10,
       //(i) => Block(i, i),
@@ -139,7 +158,7 @@ class HeeveGame extends FlameGame
 
   @override
   void onTapCancel() {
-    //tappableButtons.forEach((t) => t.onTapCancel());
+    tappableButtons.forEach((t) => t.onTapCancel());
   }
 
   void clearBuildComponent() {
@@ -307,10 +326,4 @@ class HeeveGame extends FlameGame
 
     return KeyEventResult.handled;
   }
-}
-
-mixin ButtonMethods on PositionComponent {
-  bool onTapDown();
-  bool onTapUp();
-  bool onTapCancel();
 }

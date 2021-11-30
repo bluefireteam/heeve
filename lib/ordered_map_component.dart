@@ -1,5 +1,7 @@
+import 'dart:math';
 import 'dart:ui';
 
+import 'package:collection/collection.dart';
 import 'package:flame/components.dart';
 import 'package:flame/sprite.dart';
 import 'package:ordered_set/ordered_set.dart';
@@ -7,8 +9,8 @@ import 'package:ordered_set/ordered_set.dart';
 import 'units/unit.dart';
 
 class OrderedMapComponent extends IsometricTileMapComponent {
-  late final Block corner;
-  final List<Block> occupiedBlocks = [];
+  static Random rng = Random();
+  final Set<Block> occupiedBlocks = {};
   late final OrderedSet<PositionComponent> gridChildren;
   late final int maxX;
   late final int maxY;
@@ -20,14 +22,22 @@ class OrderedMapComponent extends IsometricTileMapComponent {
   }) : super(tileset, matrix, tileHeight: tileHeight) {
     maxX = matrix.length;
     maxY = matrix.first.length;
-    corner = Block(matrix.length, matrix.first.length);
-    final cornerPosition = getBlockRenderPosition(corner);
+    final cornerPosition = getBlockRenderPosition(Block(maxX, maxY));
     int cornerDistance(PositionComponent c) =>
         c.position.distanceToSquared(cornerPosition).floor();
     gridChildren = OrderedSet(
       (c1, c2) => cornerDistance(c2).compareTo(cornerDistance(c1)),
     );
     children.register<PositionComponent>();
+
+    // Add empty tiles to occupiedBlocks so that units can't stand on them
+    for (var x = 0; x < matrix.length; x++) {
+      for (var y = 0; y < matrix.first.length; y++) {
+        if (matrix[x][y] == 4) {
+          occupiedBlocks.add(Block(y, x));
+        }
+      }
+    }
   }
 
   @override
@@ -56,8 +66,11 @@ class OrderedMapComponent extends IsometricTileMapComponent {
   bool addOnBlock(PositionComponent component, Block block) {
     if (validBlock(block)) {
       gridChildren.add(component..position = getBlockCenterPosition(block));
-      add(component);
+      if (component is Unit) {
+        component.reservedBlock = block;
+      }
       occupiedBlocks.add(block);
+      add(component);
       return true;
     }
     return false;
@@ -73,5 +86,100 @@ class OrderedMapComponent extends IsometricTileMapComponent {
     return block != null &&
         !occupiedBlocks.contains(block) &&
         containsBlock(block);
+  }
+
+  bool nonEmptyBlock(Block? block) {
+    return block != null &&
+        containsBlock(block) &&
+        matrix[block.y][block.x] != 4;
+  }
+
+  void killBlock(Block? block) {
+    if (block == null) {
+      return;
+    }
+    matrix[block.y][block.x] = 4;
+    occupiedBlocks.add(block);
+  }
+
+  Block randomEdgeBlock() {
+    assert(
+      occupiedBlocks.length < matrix.length * matrix.first.length,
+      'All blocks are occupied',
+    );
+    final isVariableX = rng.nextBool();
+    final isMin = rng.nextBool();
+    final startBlock = Block(
+      isVariableX
+          ? rng.nextInt(matrix.first.length)
+          : (isMin ? 0 : matrix.first.length),
+      !isVariableX ? rng.nextInt(matrix.length) : (isMin ? 0 : matrix.length),
+    );
+    var block = nonEmptyBlock(startBlock) ? startBlock : null;
+    var radius = 1;
+
+    // This checks one edge that could be excluded
+    while (block == null) {
+      final blocksToCheck = [
+        Block(startBlock.x, startBlock.y + radius),
+        Block(startBlock.x + radius, startBlock.y),
+        Block(startBlock.x, startBlock.y - radius),
+        Block(startBlock.x - radius, startBlock.y),
+      ]..shuffle(rng);
+      block = blocksToCheck.firstWhereOrNull(nonEmptyBlock);
+      radius++;
+    }
+    return block;
+  }
+
+  Block randomBlock() {
+    assert(
+      occupiedBlocks.length < matrix.length * matrix.first.length,
+      'All blocks are occupied',
+    );
+
+    for (;;) {
+      final block = Block(rng.nextInt(maxX), rng.nextInt(maxY));
+      if (validBlock(block)) {
+        return block;
+      }
+    }
+  }
+
+  Block findCloseValidBlock(Block startingBlock) {
+    Block? nextBlock = startingBlock;
+    final x = startingBlock.x;
+    final y = startingBlock.y;
+    var width = 1;
+    var height = 1;
+
+    while (!validBlock(nextBlock)) {
+      final topLeft = Block(x - width, y - height);
+      final bottomRight = Block(x + width, y + height);
+      final topRight = Block(bottomRight.x, topLeft.y);
+      final bottomLeft = Block(topLeft.x, bottomRight.y);
+      final blocks = _blocksBetween(topLeft, topRight)
+        ..addAll(_blocksBetween(topRight, bottomRight))
+        ..addAll(_blocksBetween(bottomRight, bottomLeft))
+        ..addAll(_blocksBetween(bottomLeft, topLeft));
+      nextBlock = blocks.firstWhereOrNull(validBlock);
+      width++;
+      height++;
+    }
+    return nextBlock!;
+  }
+
+  Set<Block> _blocksBetween(Block a, Block b) {
+    final blocks = <Block>{};
+    final minX = min(a.x, b.x);
+    final maxX = max(a.x, b.x);
+    final minY = min(a.y, b.y);
+    final maxY = max(a.y, b.y);
+    for (var x = minX; x <= maxX; x++) {
+      for (var y = minY; y <= maxY; y++) {
+        blocks.add(Block(x, y));
+      }
+    }
+    return blocks;
   }
 }

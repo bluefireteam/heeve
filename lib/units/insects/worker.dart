@@ -4,7 +4,7 @@ import '../unit.dart';
 
 class Worker extends Unit {
   static const int workerHp = 10;
-  static const int workerSpeed = 10;
+  static const int workerSpeed = 60;
 
   Worker({
     Vector2? position,

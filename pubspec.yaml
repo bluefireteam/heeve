@@ -11,6 +11,7 @@ dependencies:
   equatable: ^2.0.3
   dartlin: ^0.6.1
   flame: ^1.0.0-releasecandidate.18
+  flame_audio: ^1.0.0-rc.15
   flame_fire_atlas: ^1.0.0-rc2
   a_star_algorithm: ^0.1.1
   ordered_set: ^5.0.0
@@ -28,6 +29,7 @@ flutter:
   assets:
     - assets/images/
     - assets/sprites/
+    - assets/audio/
     - assets/sprites/humans/
     - assets/sprites/heeves/
   fonts:

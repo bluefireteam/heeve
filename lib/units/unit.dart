@@ -1,8 +1,11 @@
+import 'dart:collection';
 import 'dart:math';
 import 'dart:ui';
 
-import 'package:collection/collection.dart';
+import 'package:a_star_algorithm/a_star_algorithm.dart';
 import 'package:flame/components.dart';
+import 'package:flame/effects.dart';
+import 'package:flame/extensions.dart';
 import 'package:flame_fire_atlas/flame_fire_atlas.dart';
 
 import '../heeve_game.dart';
@@ -26,7 +29,8 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
 
   Block? target;
   Block? reservedBlock;
-  late final OrderedMapComponent map;
+  Queue<Block> path = Queue();
+  OrderedMapComponent get map => gameRef.map;
 
   Unit? attacking;
   late final Timer shootingTimer;
@@ -86,7 +90,6 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
   Future<void> onLoad() async {
     await super.onLoad();
 
-    map = gameRef.map;
     animations = {};
 
     Future<void> createAnimationState(
@@ -152,10 +155,9 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
 
     highlight.position = map.getBlockRenderPosition(block) - topLeftPosition;
 
-    final target = this.target;
     final attacking = this.attacking;
-    if (target != null) {
-      final targetBlockPosition = map.getBlockCenterPosition(target);
+    if (path.isNotEmpty) {
+      final targetBlockPosition = map.getBlockCenterPosition(path.first);
       final direction = targetBlockPosition - position;
       final step = speed * dt;
 
@@ -167,7 +169,7 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
 
       if (direction.length < step) {
         position = targetBlockPosition;
-        this.target = null;
+        path.removeFirst();
         current = current?.copyWithState(AnimationState.idle);
       } else {
         direction.scaleTo(step);
@@ -176,6 +178,10 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
     } else if (attacking != null) {
       if (attacking.isDead) {
         this.attacking = null;
+        current = UnitAnimationState.withDirection(
+          AnimationState.idle,
+          angle,
+        );
       } else {
         final direction = attacking.position - position;
         final angle = direction.angleToSigned(Vector2(1, 0));
@@ -222,49 +228,49 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
     attacking = enemy;
   }
 
-  bool moveToBlock(final Block block) {
+  Queue<Block> moveToBlock(
+    final Block targetBlock, {
+    Queue<Block>? withPath,
+  }) {
     attacking = null; // stop attacking
     final occupiedBlocks = map.occupiedBlocks;
-    var width = 1;
-    var height = 1;
-    final x = block.x;
-    final y = block.y;
-    Block? nextBlock = block;
+    final currentBlock = block;
+    occupiedBlocks.remove(reservedBlock);
+    target = reservedBlock = map.findCloseValidBlock(targetBlock);
 
-    for (;;) {
-      if (map.validBlock(nextBlock)) {
-        target = nextBlock;
-        occupiedBlocks.remove(reservedBlock);
-        occupiedBlocks.add(nextBlock!);
-        reservedBlock = nextBlock;
-        return true;
-      }
-      final topLeft = Block(x - width, y - height);
-      final bottomRight = Block(x + width, y + height);
-      final topRight = Block(bottomRight.x, topLeft.y);
-      final bottomLeft = Block(topLeft.x, bottomRight.y);
-      final blocks = _blocksBetween(topLeft, topRight)
-        ..addAll(_blocksBetween(topRight, bottomRight))
-        ..addAll(_blocksBetween(bottomRight, bottomLeft))
-        ..addAll(_blocksBetween(bottomLeft, topLeft));
-      nextBlock = blocks.firstWhereOrNull(map.validBlock);
-      width++;
-      height++;
-    }
+    path = //withPath ??
+        generatePath(
+      currentBlock,
+      target!,
+      map.matrix,
+      map.occupiedBlocks,
+    );
+    path.add(target!);
+    occupiedBlocks.add(reservedBlock!);
+    return path;
   }
 
-  Set<Block> _blocksBetween(Block a, Block b) {
-    final blocks = <Block>{};
-    final minX = min(a.x, b.x);
-    final maxX = max(a.x, b.x);
-    final minY = min(a.y, b.y);
-    final maxY = max(a.y, b.y);
-    for (var x = minX; x <= maxX; x++) {
-      for (var y = minY; y <= maxY; y++) {
-        blocks.add(Block(x, y));
-      }
-    }
-    return blocks;
+  static Queue<Block> generatePath(
+    Block startingBlock,
+    Block target,
+    List<List<int>> matrix,
+    Set<Block> occupiedBlocks,
+  ) {
+    final path = Queue<Block>();
+    final offsetPath = AStar(
+      rows: matrix.length,
+      columns: matrix.first.length,
+      start: Offset(
+        startingBlock.x.toDouble(),
+        startingBlock.y.toDouble(),
+      ),
+      end: Offset(target.x.toDouble(), target.y.toDouble()),
+      barriers: occupiedBlocks
+          .map((b) => Offset(b.x.toDouble(), b.y.toDouble()))
+          .toList(growable: false),
+    ).findThePath();
+    offsetPath.forEach((o) => path.addFirst(Block(o.dx.toInt(), o.dy.toInt())));
+    return path;
   }
 
   bool intersectsBlock(Block start, Block end) {

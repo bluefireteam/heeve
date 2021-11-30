@@ -2,17 +2,12 @@ import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flame/input.dart';
 
+import 'button_component.dart';
 import 'currency_component.dart';
 import 'heeve_game.dart';
 import 'units/building.dart';
 
-enum ButtonState {
-  pressed,
-  unpressed,
-}
-
-class BuildingButton extends SpriteGroupComponent<ButtonState>
-    with HasGameRef<HeeveGame>, ButtonMethods {
+class BuildingButton extends ButtonComponent with HasGameRef<HeeveGame> {
   final String filename;
   final Building Function() buildingComponentFunction;
   late final int cost;
@@ -31,22 +26,15 @@ class BuildingButton extends SpriteGroupComponent<ButtonState>
   Future<void> onLoad() async {
     await super.onLoad();
     children.register<PositionComponent>();
-    final pressedSprite = await gameRef.loadSprite(
+    button = await gameRef.loadSprite(
+      filename,
+      srcSize: Vector2(34, 12.5),
+    );
+    buttonDown = await gameRef.loadSprite(
       filename,
       srcPosition: Vector2(0, 12.5),
       srcSize: Vector2(34, 12.5),
     );
-    final unpressedSprite = await gameRef.loadSprite(
-      filename,
-      srcSize: Vector2(34, 12.5),
-    );
-
-    sprites = {
-      ButtonState.pressed: pressedSprite,
-      ButtonState.unpressed: unpressedSprite,
-    };
-
-    current = ButtonState.unpressed;
 
     final buildingComponent = buildingComponentFunction()
       ..position = (BuildingButton.defaultSize / 2)
@@ -83,8 +71,7 @@ class BuildingButton extends SpriteGroupComponent<ButtonState>
 
   @override
   bool onTapDown() {
-    current = ButtonState.pressed;
-    children.query<PositionComponent>().forEach((c) => c.position.y += 6);
+    super.onTapDown();
     if (gameRef.currencyNotifier.value >= cost) {
       final buildComponent = buildingComponentFunction();
       gameRef.clearBuildComponent();
@@ -100,17 +87,5 @@ class BuildingButton extends SpriteGroupComponent<ButtonState>
       );
     }
     return true;
-  }
-
-  @override
-  bool onTapUp() {
-    current = ButtonState.unpressed;
-    children.query<PositionComponent>().forEach((c) => c.position.y -= 6);
-    return true;
-  }
-
-  @override
-  bool onTapCancel() {
-    return onTapUp();
   }
 }
