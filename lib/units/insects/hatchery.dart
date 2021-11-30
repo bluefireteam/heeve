@@ -1,7 +1,7 @@
 import 'package:flame/components.dart';
-import 'package:heeve/units/insects/worker.dart';
 
 import '../building.dart';
+import 'worker.dart';
 
 class Hatchery extends Building {
   static const int nurseryHp = 1000;

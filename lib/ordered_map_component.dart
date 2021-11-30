@@ -4,9 +4,9 @@ import 'dart:ui';
 import 'package:collection/collection.dart';
 import 'package:flame/components.dart';
 import 'package:flame/sprite.dart';
-import 'package:heeve/units/insects/worker.dart';
 import 'package:ordered_set/ordered_set.dart';
 
+import 'units/insects/worker.dart';
 import 'units/unit.dart';
 
 class OrderedMapComponent extends IsometricTileMapComponent {
