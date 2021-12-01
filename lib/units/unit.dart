@@ -238,7 +238,7 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
     attacking = enemy;
   }
 
-  Queue<Block> moveToBlock(
+  void moveToBlock(
     final Block targetBlock, {
     Queue<Block>? withPath,
   }) {
@@ -247,27 +247,24 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
     final currentBlock = block;
     occupiedBlocks.remove(reservedBlock);
     target = reservedBlock = map.findCloseValidBlock(targetBlock);
+    occupiedBlocks.add(reservedBlock!);
 
-    path = //withPath ??
-        generatePath(
+    _generatePath(
       currentBlock,
       target!,
       map.matrix,
       map.occupiedBlocks,
-    );
-    path.add(target!);
-    occupiedBlocks.add(reservedBlock!);
-    return path;
+    ).then((path) => this.path = path);
   }
 
-  static Queue<Block> generatePath(
+  Future<Queue<Block>> _generatePath(
     Block startingBlock,
     Block target,
     List<List<int>> matrix,
     Set<Block> occupiedBlocks,
-  ) {
+  ) async {
     final path = Queue<Block>();
-    final offsetPath = AStar(
+    final offsetPath = await Future(AStar(
       rows: matrix.length,
       columns: matrix.first.length,
       start: Offset(
@@ -279,8 +276,9 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
           .map((b) => Offset(b.x.toDouble(), b.y.toDouble()))
           .toList(growable: false),
       //withDiagonal: false,
-    ).findThePath();
+    ).findThePath);
     offsetPath.forEach((o) => path.addFirst(Block(o.dx.toInt(), o.dy.toInt())));
+    path.add(target);
     return path;
   }
 

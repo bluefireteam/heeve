@@ -8,6 +8,7 @@ import 'package:flame/sprite.dart';
 import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:heeve/side_bar.dart';
 
 import 'button_component.dart';
 import 'map_generator.dart';
@@ -55,7 +56,7 @@ class HeeveGame extends FlameGame
       'battle.mp3',
       'sci-fi.mp3',
     ]);
-    await Future<void>.delayed(const Duration(seconds: 3));
+    //await Future<void>.delayed(const Duration(seconds: 3));
 
     camera.speed = 5000;
     camera.viewport = FixedResolutionViewport(Vector2(800, 600));
@@ -104,13 +105,8 @@ class HeeveGame extends FlameGame
   }
 
   void centerMap() {
-    camera.followVector2(
-      map.getBlockCenterPosition(
-        Block(
-          (map.width / 2).floor(),
-          (map.height / 2).floor(),
-        ),
-      ),
+    camera.snapTo(
+      (map.position - size / 2 + canvasSize / 10)..x -= SideBar.barWidth,
     );
   }
 

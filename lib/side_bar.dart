@@ -14,18 +14,18 @@ class SideBar extends NineTileBoxComponent with HasGameRef<HeeveGame> {
   @override
   int get priority => 5;
 
-  static const double _width = 200;
+  static const double barWidth = 200;
   late final CurrencyComponent currencyComponent;
   late final Butterfly currencyIndicator;
 
-  SideBar() : super(size: Vector2(_width, 0));
+  SideBar() : super(size: Vector2(barWidth, 0));
 
   @override
   void onGameResize(Vector2 gameSize) {
     super.onGameResize(gameSize);
     final canvasSize = gameRef.size;
     size.y = canvasSize.y;
-    position.x = canvasSize.x - _width;
+    position.x = canvasSize.x - barWidth;
   }
 
   @override
@@ -50,7 +50,7 @@ class SideBar extends NineTileBoxComponent with HasGameRef<HeeveGame> {
     await add(
       currencyComponent = CurrencyComponent(
         value: gameRef.currencyNotifier.value,
-        position: Vector2(_width / 2, 120),
+        position: Vector2(barWidth / 2, 120),
       ),
     );
 
