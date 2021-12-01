@@ -110,6 +110,11 @@ class HeeveGame extends FlameGame
       return;
     }
 
+    if (!FlameAudio.bgm.isPlaying) {
+      final songs = ['intro.mp3', 'battle.mp3', 'sci-fi.mp3']..shuffle();
+      FlameAudio.bgm.play(songs.first);
+    }
+
     camera.translateBy(cameraDirection * cameraMovementSpeed * dt);
     camera.snap();
   }

@@ -79,7 +79,7 @@ class WinningBox extends StoryBox {
       srcSize: Vector2(34, 12.5),
     );
     final startText = TextComponent(
-      text: 'This button does nothing',
+      text: 'Close',
       textRenderer: pixelStyle,
       position: Vector2(100, 15),
       anchor: Anchor.center,
