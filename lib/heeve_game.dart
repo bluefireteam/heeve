@@ -16,8 +16,7 @@ import 'ordered_map_component.dart';
 import 'selector.dart';
 import 'side_bar.dart';
 import 'units/building.dart';
-import 'units/humans/infantry.dart';
-import 'units/humans/infantry_group.dart';
+import 'units/humans/spaceship.dart';
 import 'units/insects/butterfly.dart';
 import 'units/insects/ore.dart';
 import 'units/unit.dart';
@@ -71,24 +70,15 @@ class HeeveGame extends FlameGame
     await add(map = OrderedMapComponent(tileset, matrix, tileHeight: 8));
     centerMap();
 
-    final infantryGroups = List.generate(
-      3,
-      (_) => InfantryGroup(List.generate(5, (_) => Infantry())),
-    );
-    infantryGroups.forEach(
-      (group) =>
-          group.units.forEach((u) => map.addOnBlock(u, map.randomBlock())),
-    );
-
-    addAll(infantryGroups);
     map.addOnBlock(Worker(), const Block(2, 2));
+    // TODO: Generate these
     map.addOnBlock(Ore(), map.randomBlock());
     map.addOnBlock(Ore(), map.randomBlock());
     map.addOnBlock(Ore(), map.randomBlock());
     map.addOnBlock(Ore(), map.randomBlock());
+    List.generate(3, (_) => map.addOnBlock(Spaceship(), map.randomBlock()));
     final butterflyBlocks = List<Block>.generate(
-      10,
-      //(i) => Block(i, i),
+      15,
       (i) => Block(i + i % 2, i + i % 3),
     );
     butterflyBlocks.forEach((block) => map.addOnBlock(Butterfly(), block));

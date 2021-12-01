@@ -4,7 +4,6 @@ import 'package:flame/input.dart';
 import 'building_button.dart';
 import 'currency_component.dart';
 import 'heeve_game.dart';
-import 'units/humans/spaceship.dart';
 import 'units/insects/butterfly.dart';
 import 'units/insects/hatchery.dart';
 
@@ -55,20 +54,12 @@ class SideBar extends NineTileBoxComponent with HasGameRef<HeeveGame> {
       ),
     );
 
-    final firstButtonPosition = Vector2(15, 150);
-    add(
-      BuildingButton(
-        'green_buttons.png',
-        () => Hatchery(),
-        position: firstButtonPosition,
-      ),
-    );
+    final firstButtonPosition = Vector2(15, 160);
     add(
       BuildingButton(
         'red_buttons.png',
-        () => Spaceship(),
-        position:
-            firstButtonPosition + Vector2(0, BuildingButton.defaultSize.y),
+        () => Hatchery(),
+        position: firstButtonPosition,
       ),
     );
 

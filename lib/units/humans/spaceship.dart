@@ -1,19 +1,47 @@
 import 'package:flame/components.dart';
 
 import '../building.dart';
+import 'infantry.dart';
+import 'infantry_group.dart';
 
 class Spaceship extends Building {
   static const int spaceshipHp = 1000;
+  late final InfantryGroup group;
 
   Spaceship({
     Vector2? position,
   }) : super(
           hp: spaceshipHp,
           position: position,
-          size: Vector2(12, 15),
+          size: Vector2(48, 60),
           anchor: Anchor.center,
         );
 
   @override
   String get idleAsset => 'human-spaceship.png';
+
+  @override
+  Future<void> onLoad() async {
+    await super.onLoad();
+    group = InfantryGroup();
+    add(group);
+  }
+
+  @override
+  void update(double dt) {
+    super.update(dt);
+    if (timeSinceSpawn > spawnRate &&
+        gameRef.map.children.query<Infantry>().length < maxPopulation) {
+      final infantry = Infantry();
+      group.units.add(infantry);
+      gameRef.map.addOnBlock(infantry, map.findCloseValidBlock(block));
+      timeSinceSpawn = 0;
+    }
+  }
+
+  @override
+  void onRemove() {
+    gameRef.map.occupiedBlocks.remove(group.groupTarget);
+    super.onRemove();
+  }
 }

@@ -23,6 +23,10 @@ class Worker extends Unit with HasHitboxes, Collidable {
     addHitbox(HitboxCircle());
   }
 
+  /// The exact point within the sprite where bullets should be shot/hit.
+  @override
+  Vector2 get bulletPosition => position - Vector2(0, height / 4);
+
   @override
   String get moveAsset => 'heeves/worker.fa';
 

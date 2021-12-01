@@ -15,7 +15,6 @@ import '../highlight.dart';
 import '../offset_extension.dart';
 import '../ordered_map_component.dart';
 import '../projectile.dart';
-import 'building.dart';
 import 'life_bar.dart';
 import 'unit_animation_state.dart';
 
@@ -30,6 +29,7 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
   final int hp;
   double currentHp;
   final int speed;
+  final bool hasFireAtlas = true;
 
   Block? target;
   Block? reservedBlock;
@@ -97,7 +97,7 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
 
     animations = {};
 
-    if (this is Building) {
+    if (!hasFireAtlas) {
       Future<void> createStaticState(String asset, AnimationState state) async {
         final sprite = await gameRef.loadSpriteAnimation(
           asset,
@@ -284,12 +284,16 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
     target = reservedBlock = map.findCloseValidBlock(targetBlock);
     occupiedBlocks.add(reservedBlock!);
 
-    _generatePath(
-      currentBlock,
-      target!,
-      map.matrix,
-      map.occupiedBlocks,
-    ).then((path) => this.path = path);
+    // TODO: Optimize so that not all units in a group have to re-run this
+    //_generatePath(
+    //  currentBlock,
+    //  target!,
+    //  map.matrix,
+    //  map.occupiedBlocks,
+    //).then((path) => this.path = path);
+    path
+      ..clear()
+      ..addFirst(target!);
   }
 
   Future<Queue<Block>> _generatePath(

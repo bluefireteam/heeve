@@ -4,8 +4,15 @@ import '../ordered_map_component.dart';
 import 'unit.dart';
 
 abstract class Building extends Unit {
+  final int spawnRate = 30;
+  final int maxPopulation = 10;
+  double timeSinceSpawn = 30;
+
   final int cost;
   bool get isActive => parent is OrderedMapComponent;
+
+  @override
+  final bool hasFireAtlas = false;
 
   @override
   final bool selectable = false;
@@ -28,4 +35,10 @@ abstract class Building extends Unit {
           position: position,
           anchor: anchor,
         );
+
+  @override
+  void update(double dt) {
+    super.update(dt);
+    timeSinceSpawn += dt;
+  }
 }

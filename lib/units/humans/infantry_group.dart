@@ -7,14 +7,14 @@ import '../unit.dart';
 
 class InfantryGroup extends Component with HasGameRef<HeeveGame> {
   static final Random _rng = Random();
-  final List<Unit> units;
+  final List<Unit> units = [];
   double timeSinceUpdate = 0;
   Block? groupTarget;
   Vector2? groupTargetPosition;
   late final int updateRate;
   final int abortRate = 100;
 
-  InfantryGroup(this.units) {
+  InfantryGroup() {
     updateRate = 5 + _rng.nextInt(10);
   }
 
@@ -32,13 +32,6 @@ class InfantryGroup extends Component with HasGameRef<HeeveGame> {
     timeSinceUpdate += dt;
     if (timeSinceUpdate > abortRate ||
         (timeSinceUpdate > updateRate && (units.isEmpty || closeToTarget()))) {
-      if (units.isEmpty) {
-        if (groupTarget != null) {
-          gameRef.map.occupiedBlocks.remove(groupTarget!);
-        }
-        removeFromParent();
-        return;
-      }
       gameRef.map.killBlock(groupTarget);
       groupTarget = gameRef.map.randomEdgeBlock();
       groupTargetPosition = gameRef.map.getBlockCenterPosition(groupTarget!);

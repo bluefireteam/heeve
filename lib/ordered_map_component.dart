@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:collection/collection.dart';
 import 'package:flame/components.dart';
 import 'package:flame/sprite.dart';
+import 'package:heeve/units/humans/infantry.dart';
 import 'package:ordered_set/ordered_set.dart';
 
 import 'has_block.dart';
@@ -29,7 +30,7 @@ class OrderedMapComponent extends IsometricTileMapComponent {
     await super.onLoad();
     children.register<Worker>();
     children.register<Butterfly>();
-    children.register<PositionComponent>();
+    children.register<Infantry>();
     maxX = matrix.length;
     maxY = matrix.first.length;
     int blockPriority(HasBlock c) => c.block.x + c.block.y;
