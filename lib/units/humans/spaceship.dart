@@ -17,8 +17,5 @@ class Spaceship extends Building {
         );
 
   @override
-  Future<void> onLoad() async {
-    await super.onLoad();
-    sprite = await gameRef.loadSprite('human-spaceship.png');
-  }
+  String get idleAsset => 'human-spaceship.png';
 }

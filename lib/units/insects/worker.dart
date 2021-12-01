@@ -12,7 +12,7 @@ class Worker extends Unit {
           position: position,
           hp: workerHp,
           speed: workerSpeed,
-          size: Vector2.all(50),
+          size: Vector2.all(40),
           anchor: const Anchor(0.5, 0.75),
         );
 

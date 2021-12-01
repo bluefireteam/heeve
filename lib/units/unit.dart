@@ -14,6 +14,7 @@ import '../highlight.dart';
 import '../offset_extension.dart';
 import '../ordered_map_component.dart';
 import '../projectile.dart';
+import 'building.dart';
 import 'life_bar.dart';
 import 'unit_animation_state.dart';
 
@@ -65,8 +66,8 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
     shootingTimer = Timer(1, repeat: true, onTick: shoot);
   }
 
-  String get moveAsset;
   String get idleAsset;
+  String get moveAsset => idleAsset;
   String get dieAsset => idleAsset;
   String get attackAsset => idleAsset;
 
@@ -76,6 +77,7 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
   bool get isDead => currentHp <= 0;
 
   bool get selectable => !isDead;
+  final bool movable = true;
 
   String _formatDirectionState(DirectionState state) =>
       state.toString().split('.')[1];
@@ -94,24 +96,46 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
 
     animations = {};
 
-    Future<void> createAnimationState(
-      String asset,
-      AnimationState state,
-    ) async {
-      final atlas = await gameRef.loadFireAtlas(_asset(asset));
+    if (this is Building) {
+      Future<void> createStaticState(String asset, AnimationState state) async {
+        final sprite = await gameRef.loadSpriteAnimation(
+          asset,
+          SpriteAnimationData.sequenced(
+            amount: 1,
+            stepTime: 100000,
+            textureSize: Vector2(96, 112),
+          ),
+        );
 
-      DirectionState.values.forEach((directionState) {
-        animations![UnitAnimationState(
-          animation: state,
-          direction: directionState,
-        )] = atlas.getAnimation(_formatDirectionState(directionState));
-      });
+        DirectionState.values.forEach((directionState) {
+          animations![UnitAnimationState(
+            animation: state,
+            direction: directionState,
+          )] = sprite;
+        });
+      }
+
+      await createStaticState(idleAsset, AnimationState.idle);
+    } else {
+      Future<void> createAnimationState(
+        String asset,
+        AnimationState state,
+      ) async {
+        final atlas = await gameRef.loadFireAtlas(_asset(asset));
+
+        DirectionState.values.forEach((directionState) {
+          animations![UnitAnimationState(
+            animation: state,
+            direction: directionState,
+          )] = atlas.getAnimation(_formatDirectionState(directionState));
+        });
+      }
+
+      await createAnimationState(idleAsset, AnimationState.idle);
+      await createAnimationState(moveAsset, AnimationState.move);
+      await createAnimationState(attackAsset, AnimationState.attack);
+      await createAnimationState(dieAsset, AnimationState.die);
     }
-
-    await createAnimationState(idleAsset, AnimationState.idle);
-    await createAnimationState(moveAsset, AnimationState.move);
-    await createAnimationState(attackAsset, AnimationState.attack);
-    await createAnimationState(dieAsset, AnimationState.die);
 
     await add(Highlight());
   }
@@ -178,7 +202,7 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
         direction.scaleTo(step);
         position += direction;
       }
-    } else if (attackTarget != null && attackTarget.distance(this) < 30) {
+    } else if (attackTarget != null) {
       if (attackTarget.isDead) {
         this.attackTarget = null;
         current = UnitAnimationState.withDirection(
@@ -224,7 +248,6 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
         direction: current?.direction ?? DirectionState.upLeft,
       );
       if (dieAsset == idleAsset) {
-        print('tries to die');
         add(
           SizeEffect(
             size: Vector2.zero(),
@@ -238,7 +261,18 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
   }
 
   void attack(Unit enemy) {
-    attackTarget = enemy;
+    if (enemy.distance(this) < 30) {
+      attackTarget = enemy;
+      path.clear();
+    } else {
+      add(
+        RotateEffect(
+          angle: 0.5,
+          duration: 0.2,
+          isAlternating: true,
+        ),
+      );
+    }
   }
 
   Future<void> moveToBlock(final Block targetBlock) async {

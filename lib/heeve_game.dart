@@ -114,7 +114,7 @@ class HeeveGame extends FlameGame
   void onTapDown(TapDownInfo details) {
     final building = buildingComponent;
     if (building != null) {
-      final block = map.getBlockRenderedAt(building.topLeftPosition);
+      final block = map.getBlock(details.eventPosition.game);
       if (!map.occupiedBlocks.contains(block)) {
         building.size.scale(2);
         map.addOnBlock(building, block);
@@ -179,7 +179,9 @@ class HeeveGame extends FlameGame
       });
     } else {
       selectedUnits.forEach((unit) {
-        unit.moveToBlock(block);
+        if (unit.movable) {
+          unit.moveToBlock(block);
+        }
       });
     }
     clearBuildComponent();
