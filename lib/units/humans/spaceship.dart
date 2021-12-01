@@ -1,6 +1,7 @@
 import 'package:flame/components.dart';
 
 import '../building.dart';
+import '../unit.dart';
 import 'infantry.dart';
 import 'infantry_group.dart';
 
@@ -34,6 +35,14 @@ class Spaceship extends Building {
   @override
   void update(double dt) {
     super.update(dt);
+    if (attackedBy.isNotEmpty &&
+        group.units.any((u) => u.attackTarget == null)) {
+      Unit randomAttacker() => (attackedBy..shuffle()).first;
+      group.units.forEach((u) {
+        u.moveToBlock(map.findCloseValidBlock(block));
+        u.attackTarget = randomAttacker();
+      });
+    }
     if (timeSinceSpawn > spawnRate &&
         gameRef.map.children.query<Infantry>().length < maxPopulation) {
       final infantry = Infantry();

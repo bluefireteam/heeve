@@ -180,6 +180,7 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
       }
       return;
     }
+    attackedBy.removeWhere((u) => u.isDead);
 
     highlight.position = map.getBlockRenderPosition(block) - topLeftPosition;
 
