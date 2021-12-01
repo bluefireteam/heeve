@@ -96,6 +96,7 @@ class InstructionsBox extends StoryBox {
       onPressed: () {
         startText.position.y += 6;
         gameRef.add(SideBar());
+        gameRef.hasStarted = true;
         removeFromParent();
       },
     )..add(startText);
