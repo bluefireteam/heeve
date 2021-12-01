@@ -12,7 +12,7 @@ class InfantryGroup extends Component with HasGameRef<HeeveGame> {
   Block? groupTarget;
   Vector2? groupTargetPosition;
   late final int updateRate;
-  final int abortRate = 100;
+  final int abortRate = 40;
 
   InfantryGroup() {
     updateRate = 5 + _rng.nextInt(10);
@@ -20,10 +20,11 @@ class InfantryGroup extends Component with HasGameRef<HeeveGame> {
 
   bool closeToTarget() {
     return units.any((u) {
-      return (groupTargetPosition?.distanceToSquared(units.first.position) ??
-              0) <
-          1000;
-    });
+          return (groupTargetPosition?.distanceToSquared(u.position) ?? 0) <
+              1000;
+        }) ||
+        units.every((u) => u.isDead);
+    ;
   }
 
   @override
@@ -31,7 +32,7 @@ class InfantryGroup extends Component with HasGameRef<HeeveGame> {
     super.update(dt);
     timeSinceUpdate += dt;
     if (timeSinceUpdate > abortRate ||
-        (timeSinceUpdate > updateRate && (units.isEmpty || closeToTarget()))) {
+        (timeSinceUpdate > updateRate && closeToTarget())) {
       gameRef.map.killBlock(groupTarget);
       groupTarget = gameRef.map.randomEdgeBlock();
       groupTargetPosition = gameRef.map.getBlockCenterPosition(groupTarget!);
