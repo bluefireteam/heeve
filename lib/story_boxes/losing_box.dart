@@ -4,12 +4,12 @@ import 'package:flame/input.dart';
 import 'package:flutter/material.dart';
 
 import '../button_component.dart';
+import '../side_bar.dart';
 import '../units/insects/worker.dart';
 import '../units/unit_animation_state.dart';
-import 'instructions_box.dart';
 import 'story_box.dart';
 
-class IntroBox extends StoryBox {
+class LosingBox extends StoryBox {
   final storyStyle = TextPaint(
     style: const TextStyle(
       color: Colors.black38,
@@ -17,10 +17,8 @@ class IntroBox extends StoryBox {
       fontFamily: 'Sigmar',
     ),
   );
-  late final TextBoxComponent _firstPartTextComponent;
-  bool _secondPartAdded = false;
 
-  IntroBox() : super(size: Vector2(380, 220));
+  LosingBox() : super(size: Vector2(380, 400));
 
   @override
   Future<void> onLoad() async {
@@ -60,10 +58,12 @@ class IntroBox extends StoryBox {
       ),
     );
 
-    _firstPartTextComponent = TextBoxComponent(
-      text: 'The most terrible parasites in the universe have arrived on your '
-          'planet. They have already destroyed several planets by their '
-          'overconsumption.',
+    final instructionsText = TextBoxComponent(
+      text: 'Gather butterflies (your food) by attacking the mines and kill '
+          'the humans and their ships by right clicking on them (when you are '
+          'close enough). Select insectoids by dragging or left click on them. '
+          'Build hatcheries by collecting enough butterflies, they will spawn '
+          'more insectoids.',
       textRenderer: storyStyle,
       boxConfig: TextBoxConfig(timePerChar: 0.08, maxWidth: 280),
       position: Vector2(size.x / 2 + 20, 170),
@@ -90,47 +90,17 @@ class IntroBox extends StoryBox {
     final startButton = ButtonComponent(
       button: unpressedSprite,
       buttonDown: pressedSprite,
-      position: Vector2(width / 2, 165),
+      position: Vector2(width / 2, 345),
       size: Vector2(200, 40),
       anchor: Anchor.center,
       onPressed: () {
-        if (_secondPartAdded) {
-          gameRef.add(InstructionsBox());
-          removeFromParent();
-        }
+        startText.position.y += 6;
+        gameRef.add(SideBar());
+        removeFromParent();
       },
     )..add(startText);
     gameRef.tappableButtons.add(startButton);
-    add(
-      startButton
-        ..add(
-          MoveEffect(
-            path: [Vector2(0, 180)],
-            duration: 0.7,
-            isRelative: true,
-            onComplete: () => add(_firstPartTextComponent),
-          ),
-        ),
-    );
-    add(SizeEffect(size: Vector2(380, 400), duration: 0.5));
-  }
-
-  @override
-  void update(double dt) {
-    super.update(dt);
-    if (!_secondPartAdded && _firstPartTextComponent.finished) {
-      _secondPartAdded = true;
-      add(
-        TextBoxComponent(
-          text:
-              'Apparently they are called humans, and you have to stop them before '
-              'they turn your planet into an uninhabitable void.',
-          textRenderer: storyStyle,
-          boxConfig: TextBoxConfig(timePerChar: 0.08, maxWidth: 280),
-          position: Vector2(size.x / 2 + 20, 270),
-          anchor: Anchor.center,
-        ),
-      );
-    }
+    add(instructionsText);
+    add(startButton);
   }
 }

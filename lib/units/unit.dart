@@ -26,6 +26,7 @@ import 'unit_animation_state.dart';
 /// All positions are anchored in the center.
 abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
     with HasGameRef<HeeveGame>, HasBlock {
+  static Random rng = Random();
   final int hp;
   double currentHp;
   final int speed;

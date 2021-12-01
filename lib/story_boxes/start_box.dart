@@ -11,12 +11,12 @@ import 'story_box.dart';
 // This is shown before the story so that we can play the audio meanwhile the
 // user reads on the next box.
 class StartBox extends StoryBox {
-  StartBox() : super(size: Vector2(300, 220));
+  StartBox() : super(size: Vector2(380, 220));
 
   @override
   Future<void> onLoad() async {
     await super.onLoad();
-    final logo = Worker(position: Vector2(size.x / 2, 90));
+    final logo = Worker(position: Vector2(size.x / 2, 70));
     await add(logo);
     logo.current = const UnitAnimationState(
       animation: AnimationState.move,

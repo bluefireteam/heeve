@@ -8,6 +8,7 @@ import 'package:ordered_set/ordered_set.dart';
 
 import 'has_block.dart';
 import 'units/humans/infantry.dart';
+import 'units/humans/spaceship.dart';
 import 'units/insects/butterfly.dart';
 import 'units/insects/worker.dart';
 import 'units/unit.dart';
@@ -18,6 +19,7 @@ class OrderedMapComponent extends IsometricTileMapComponent {
   late final OrderedSet<HasBlock> gridChildren;
   late final int maxX;
   late final int maxY;
+  int killedBlocks = 0;
 
   OrderedMapComponent(
     SpriteSheet tileset,
@@ -31,6 +33,7 @@ class OrderedMapComponent extends IsometricTileMapComponent {
     children.register<Worker>();
     children.register<Butterfly>();
     children.register<Infantry>();
+    children.register<Spaceship>();
     maxX = matrix.length;
     maxY = matrix.first.length;
     int blockPriority(HasBlock c) => c.block.x + c.block.y;
@@ -107,6 +110,7 @@ class OrderedMapComponent extends IsometricTileMapComponent {
     if (block == null) {
       return;
     }
+    killedBlocks++;
     matrix[block.y][block.x] = 4;
     occupiedBlocks.add(block);
   }

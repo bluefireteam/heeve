@@ -14,7 +14,11 @@ import 'map_generator.dart';
 import 'ordered_map_component.dart';
 import 'selector.dart';
 import 'side_bar.dart';
+import 'story_boxes/losing_box.dart';
+import 'story_boxes/start_box.dart';
+import 'story_boxes/winning_box.dart';
 import 'units/building.dart';
+import 'units/humans/infantry.dart';
 import 'units/humans/spaceship.dart';
 import 'units/insects/butterfly.dart';
 import 'units/insects/ore.dart';
@@ -46,6 +50,15 @@ class HeeveGame extends FlameGame
 
   final ValueNotifier<int> currencyNotifier = ValueNotifier<int>(0);
 
+  bool hasStarted = false;
+  bool get hasWon {
+    return hasStarted &&
+        map.children.query<Spaceship>().isEmpty &&
+        map.children.query<Infantry>().isEmpty;
+  }
+
+  bool get hasLost => map.killedBlocks >= 100;
+
   @override
   Future<void> onLoad() async {
     await super.onLoad();
@@ -59,8 +72,8 @@ class HeeveGame extends FlameGame
     camera.speed = 5000;
     camera.viewport = FixedResolutionViewport(Vector2(800, 600));
 
-    //add(StartBox()); // TODO(spydon): swap these later
-    add(SideBar());
+    add(StartBox());
+    //add(SideBar());
     tileset = SpriteSheet(
       image: await images.load('tileset.png'),
       srcSize: Vector2.all(32.0),
@@ -71,11 +84,7 @@ class HeeveGame extends FlameGame
     centerMap();
 
     map.addOnBlock(Worker(), const Block(2, 2));
-    // TODO: Generate these
-    map.addOnBlock(Ore(), map.randomBlock());
-    map.addOnBlock(Ore(), map.randomBlock());
-    map.addOnBlock(Ore(), map.randomBlock());
-    map.addOnBlock(Ore(), map.randomBlock());
+    List.generate(4, (_) => map.addOnBlock(Ore(), map.randomBlock()));
     List.generate(3, (_) => map.addOnBlock(Spaceship(), map.randomBlock()));
     final butterflyBlocks = List<Block>.generate(
       15,
@@ -89,6 +98,14 @@ class HeeveGame extends FlameGame
   @override
   void update(double dt) {
     super.update(dt);
+
+    if (hasWon) {
+      add(WinningBox());
+      return;
+    } else if (hasLost) {
+      add(LosingBox());
+      return;
+    }
 
     camera.translateBy(cameraDirection * cameraMovementSpeed * dt);
     camera.snap();
