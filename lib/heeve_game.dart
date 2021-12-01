@@ -51,6 +51,7 @@ class HeeveGame extends FlameGame
   final ValueNotifier<int> currencyNotifier = ValueNotifier<int>(0);
 
   bool hasStarted = false;
+  bool hasShownEndBox = false;
   bool get hasWon {
     return hasStarted &&
         map.children.query<Spaceship>().isEmpty &&
@@ -99,11 +100,13 @@ class HeeveGame extends FlameGame
   void update(double dt) {
     super.update(dt);
 
-    if (hasWon) {
+    if (hasWon && !hasShownEndBox) {
       add(WinningBox());
+      hasShownEndBox = true;
       return;
     } else if (hasLost) {
       add(LosingBox());
+      hasShownEndBox = true;
       return;
     }
 

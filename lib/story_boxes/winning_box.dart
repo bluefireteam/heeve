@@ -4,7 +4,6 @@ import 'package:flame/input.dart';
 import 'package:flutter/material.dart';
 
 import '../button_component.dart';
-import '../side_bar.dart';
 import '../units/insects/worker.dart';
 import '../units/unit_animation_state.dart';
 import 'story_box.dart';
@@ -59,11 +58,10 @@ class WinningBox extends StoryBox {
     );
 
     final instructionsText = TextBoxComponent(
-      text: 'Gather butterflies (your food) by attacking the mines and kill '
-          'the humans and their ships by right clicking on them (when you are '
-          'close enough). Select insectoids by dragging or left click on them. '
-          'Build hatcheries by collecting enough butterflies, they will spawn '
-          'more insectoids.',
+      text: 'You managed to fight off the humans and you and your kind can now '
+          'live in harmony on your planet. (Until the next time that they '
+          'arrive, but by then you will be prepared with more buildings and '
+          'more types of insectiods.)',
       textRenderer: storyStyle,
       boxConfig: TextBoxConfig(timePerChar: 0.08, maxWidth: 280),
       position: Vector2(size.x / 2 + 20, 170),
@@ -81,7 +79,7 @@ class WinningBox extends StoryBox {
       srcSize: Vector2(34, 12.5),
     );
     final startText = TextComponent(
-      text: 'Go get them!',
+      text: 'This button does nothing',
       textRenderer: pixelStyle,
       position: Vector2(100, 15),
       anchor: Anchor.center,
@@ -93,11 +91,7 @@ class WinningBox extends StoryBox {
       position: Vector2(width / 2, 345),
       size: Vector2(200, 40),
       anchor: Anchor.center,
-      onPressed: () {
-        startText.position.y += 6;
-        gameRef.add(SideBar());
-        removeFromParent();
-      },
+      onPressed: removeFromParent,
     )..add(startText);
     gameRef.tappableButtons.add(startButton);
     add(instructionsText);

@@ -1,5 +1,6 @@
 import 'package:flame/components.dart';
 import 'package:flame/input.dart';
+import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/material.dart';
 
 import '../button_component.dart';
@@ -77,7 +78,7 @@ class StartBox extends StoryBox {
       onPressed: () {
         removeFromParent();
         gameRef.add(IntroBox());
-        //FlameAudio.bgm.play('intro.mp3');
+        FlameAudio.bgm.play('intro.mp3');
       },
     )..add(startText);
     gameRef.tappableButtons.add(startButton);
