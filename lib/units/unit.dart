@@ -267,6 +267,8 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
     if (enemy.distance(this) < 100) {
       attackTarget = enemy;
       path.clear();
+      enemy.attackedBy.add(this);
+      enemy.path.clear();
     } else {
       add(
         RotateEffect(

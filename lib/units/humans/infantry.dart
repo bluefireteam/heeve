@@ -3,7 +3,7 @@ import 'package:flame/components.dart';
 import '../unit.dart';
 
 class Infantry extends Unit {
-  static const int infantryHp = 50;
+  static const int infantryHp = 100;
   static const int infantrySpeed = 50;
 
   @override
@@ -21,7 +21,7 @@ class Infantry extends Unit {
   @override
   void update(double dt) {
     super.update(dt);
-    if (attackTarget != null && attackedBy.isNotEmpty) {
+    if (attackTarget == null && attackedBy.isNotEmpty) {
       path.clear();
       attackTarget = (attackedBy..shuffle()).first;
     }

@@ -20,6 +20,10 @@ class Spaceship extends Building {
   @override
   String get idleAsset => 'human-spaceship.png';
 
+  /// The exact point within the sprite where bullets should be shot/hit.
+  @override
+  Vector2 get bulletPosition => position - Vector2(0, height / 3);
+
   @override
   Future<void> onLoad() async {
     await super.onLoad();

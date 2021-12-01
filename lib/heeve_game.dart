@@ -190,7 +190,6 @@ class HeeveGame extends FlameGame
       selectedUnits.whereType<Worker>().forEach((worker) {
         if (worker != enemy) {
           worker.attack(enemy);
-          enemy.attackedBy.add(worker);
         }
       });
     } else {
