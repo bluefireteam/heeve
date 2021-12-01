@@ -6,13 +6,15 @@ import 'package:flame/components.dart';
 import 'package:flame/sprite.dart';
 import 'package:ordered_set/ordered_set.dart';
 
+import 'has_block.dart';
+import 'units/insects/butterfly.dart';
 import 'units/insects/worker.dart';
 import 'units/unit.dart';
 
 class OrderedMapComponent extends IsometricTileMapComponent {
   static Random rng = Random();
   final Set<Block> occupiedBlocks = {};
-  late final OrderedSet<PositionComponent> gridChildren;
+  late final OrderedSet<HasBlock> gridChildren;
   late final int maxX;
   late final int maxY;
 
@@ -20,17 +22,20 @@ class OrderedMapComponent extends IsometricTileMapComponent {
     SpriteSheet tileset,
     List<List<int>> matrix, {
     double? tileHeight,
-  }) : super(tileset, matrix, tileHeight: tileHeight) {
+  }) : super(tileset, matrix, tileHeight: tileHeight);
+
+  @override
+  Future<void> onLoad() async {
+    await super.onLoad();
     children.register<Worker>();
+    children.register<Butterfly>();
+    children.register<PositionComponent>();
     maxX = matrix.length;
     maxY = matrix.first.length;
-    final cornerPosition = getBlockRenderPosition(Block(maxX, maxY));
-    int cornerDistance(PositionComponent c) =>
-        c.position.distanceToSquared(cornerPosition).floor();
+    int blockPriority(HasBlock c) => c.block.x + c.block.y;
     gridChildren = OrderedSet(
-      (c1, c2) => cornerDistance(c2).compareTo(cornerDistance(c1)),
+      (c1, c2) => blockPriority(c1).compareTo(blockPriority(c2)),
     );
-    children.register<PositionComponent>();
 
     // Add empty tiles to occupiedBlocks so that units can't stand on them
     for (var x = 0; x < matrix.length; x++) {
@@ -65,13 +70,14 @@ class OrderedMapComponent extends IsometricTileMapComponent {
     canvas.restore();
   }
 
-  bool addOnBlock(PositionComponent component, Block block) {
+  bool addOnBlock(HasBlock component, Block block) {
     if (validBlock(block)) {
+      component.initialBlock = block;
       gridChildren.add(component..position = getBlockCenterPosition(block));
       if (component is Unit) {
         component.reservedBlock = block;
+        occupiedBlocks.add(block);
       }
-      occupiedBlocks.add(block);
       add(component);
       return true;
     }

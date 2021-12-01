@@ -4,15 +4,20 @@ import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flame/geometry.dart';
 import 'package:flutter/animation.dart';
+import 'package:heeve/units/insects/worker.dart';
 
+import '../../has_block.dart';
 import '../../heeve_game.dart';
-import '../humans/infantry.dart';
+import '../../ordered_map_component.dart';
 
 class Butterfly extends SpriteAnimationComponent
-    with HasGameRef<HeeveGame>, HasHitboxes, Collidable {
+    with HasGameRef<HeeveGame>, HasHitboxes, Collidable, HasBlock {
   static final _rng = Random();
   bool _isPickedUp = false;
   bool loop;
+
+  @override
+  OrderedMapComponent get map => gameRef.map;
 
   Butterfly({
     Vector2? position,
@@ -45,8 +50,7 @@ class Butterfly extends SpriteAnimationComponent
 
   @override
   void onCollision(_, Component other) {
-    if (!_isPickedUp && other is Infantry) {
-      // TODO(spydon): Change to worker
+    if (!_isPickedUp && other is Worker) {
       _isPickedUp = true;
       gameRef.currencyNotifier.value++;
       add(

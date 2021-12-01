@@ -9,6 +9,7 @@ import 'package:flame/extensions.dart';
 import 'package:flame_fire_atlas/flame_fire_atlas.dart';
 
 import '../block_extension.dart';
+import '../has_block.dart';
 import '../heeve_game.dart';
 import '../highlight.dart';
 import '../offset_extension.dart';
@@ -25,7 +26,7 @@ import 'unit_animation_state.dart';
 ///
 /// All positions are anchored in the center.
 abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
-    with HasHitboxes, Collidable, HasGameRef<HeeveGame> {
+    with HasGameRef<HeeveGame>, HasBlock {
   final int hp;
   double currentHp;
   final int speed;
@@ -33,6 +34,8 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
   Block? target;
   Block? reservedBlock;
   Queue<Block> path = Queue();
+
+  @override
   OrderedMapComponent get map => gameRef.map;
 
   Unit? attackTarget;
@@ -84,9 +87,7 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
 
   String _asset(String path) => 'sprites/$path';
 
-  Block get block => map.getBlock(position);
-
-  Highlight get highlight => children.first as Highlight;
+  late final Highlight highlight;
 
   bool get shouldRenderLifeBar => !isDead && (selected || currentHp < hp);
 
@@ -137,7 +138,7 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
       await createAnimationState(dieAsset, AnimationState.die);
     }
 
-    await add(Highlight());
+    await add(highlight = Highlight());
   }
 
   @override
@@ -261,7 +262,7 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
   }
 
   void attack(Unit enemy) {
-    if (enemy.distance(this) < 30) {
+    if (enemy.distance(this) < 100) {
       attackTarget = enemy;
       path.clear();
     } else {

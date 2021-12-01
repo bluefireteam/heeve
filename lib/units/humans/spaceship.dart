@@ -4,16 +4,14 @@ import '../building.dart';
 
 class Spaceship extends Building {
   static const int spaceshipHp = 1000;
-  static const int spaceshipCost = 3;
 
   Spaceship({
     Vector2? position,
   }) : super(
           hp: spaceshipHp,
-          cost: spaceshipCost,
           position: position,
-          size: Vector2(40, 32),
-          priority: 3,
+          size: Vector2(12, 15),
+          anchor: Anchor.center,
         );
 
   @override

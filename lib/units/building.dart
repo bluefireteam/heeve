@@ -15,16 +15,17 @@ abstract class Building extends Unit {
 
   Building({
     required int hp,
-    required this.cost,
+    this.cost = 0,
     Vector2? position,
     Vector2? size,
     int? priority,
+    Anchor? anchor,
   }) : super(
           hp: hp,
           speed: 0,
           size: size,
           priority: priority,
           position: position,
-          anchor: const Anchor(0.5, 0.75),
+          anchor: anchor,
         );
 }

@@ -1,11 +1,13 @@
 import 'package:flame/components.dart';
-import 'package:flame/geometry.dart';
 
 import '../unit.dart';
 
 class Infantry extends Unit {
   static const int infantryHp = 50;
   static const int infantrySpeed = 50;
+
+  @override
+  final bool movable = false;
 
   Infantry({
     Vector2? position,
@@ -15,12 +17,6 @@ class Infantry extends Unit {
           speed: infantrySpeed,
           size: Vector2(50, 50),
         );
-
-  @override
-  Future<void> onLoad() async {
-    await super.onLoad();
-    addHitbox(HitboxRectangle(relation: Vector2(0.3, 0.7)));
-  }
 
   @override
   String get moveAsset => 'humans/infantry.fa';

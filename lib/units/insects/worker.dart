@@ -1,8 +1,9 @@
 import 'package:flame/components.dart';
+import 'package:flame/geometry.dart';
 
 import '../unit.dart';
 
-class Worker extends Unit {
+class Worker extends Unit with HasHitboxes, Collidable {
   static const int workerHp = 10;
   static const int workerSpeed = 60;
 
@@ -19,7 +20,7 @@ class Worker extends Unit {
   @override
   Future<void> onLoad() async {
     await super.onLoad();
-    //addHitbox(HitboxRectangle(relation: Vector2(0.3, 0.7)));
+    addHitbox(HitboxCircle());
   }
 
   @override
