@@ -264,19 +264,21 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
     Set<Block> occupiedBlocks,
   ) async {
     final path = Queue<Block>();
-    final offsetPath = await Future(AStar(
-      rows: matrix.length,
-      columns: matrix.first.length,
-      start: Offset(
-        startingBlock.x.toDouble(),
-        startingBlock.y.toDouble(),
-      ),
-      end: Offset(target.x.toDouble(), target.y.toDouble()),
-      barriers: occupiedBlocks
-          .map((b) => Offset(b.x.toDouble(), b.y.toDouble()))
-          .toList(growable: false),
-      //withDiagonal: false,
-    ).findThePath);
+    final offsetPath = await Future(
+      AStar(
+        rows: matrix.length,
+        columns: matrix.first.length,
+        start: Offset(
+          startingBlock.x.toDouble(),
+          startingBlock.y.toDouble(),
+        ),
+        end: Offset(target.x.toDouble(), target.y.toDouble()),
+        barriers: occupiedBlocks
+            .map((b) => Offset(b.x.toDouble(), b.y.toDouble()))
+            .toList(growable: false),
+        //withDiagonal: false,
+      ).findThePath,
+    );
     offsetPath.forEach((o) => path.addFirst(Block(o.dx.toInt(), o.dy.toInt())));
     path.add(target);
     return path;

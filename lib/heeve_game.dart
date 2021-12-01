@@ -8,12 +8,12 @@ import 'package:flame/sprite.dart';
 import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:heeve/side_bar.dart';
 
 import 'button_component.dart';
 import 'map_generator.dart';
 import 'ordered_map_component.dart';
 import 'selector.dart';
+import 'side_bar.dart';
 import 'story_boxes/start_box.dart';
 import 'units/building.dart';
 import 'units/humans/infantry.dart';
