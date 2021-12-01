@@ -43,13 +43,8 @@ class InfantryGroup extends Component with HasGameRef<HeeveGame> {
       groupTarget = gameRef.map.randomEdgeBlock();
       groupTargetPosition = gameRef.map.getBlockCenterPosition(groupTarget!);
       gameRef.map.occupiedBlocks.add(groupTarget!);
-      units.forEach((u) {
-        if (u.isDead) {
-          units.remove(u);
-        } else {
-          u.moveToBlock(groupTarget!);
-        }
-      });
+      units.removeWhere((u) => u.isDead);
+      units.forEach((u) => u.moveToBlock(groupTarget!));
       timeSinceUpdate = 0;
     }
   }

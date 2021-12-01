@@ -7,11 +7,11 @@ import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame_fire_atlas/flame_fire_atlas.dart';
-import 'package:heeve/block_extension.dart';
-import 'package:heeve/offset_extension.dart';
 
+import '../block_extension.dart';
 import '../heeve_game.dart';
 import '../highlight.dart';
+import '../offset_extension.dart';
 import '../ordered_map_component.dart';
 import '../projectile.dart';
 import 'life_bar.dart';
@@ -34,7 +34,7 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
   Queue<Block> path = Queue();
   OrderedMapComponent get map => gameRef.map;
 
-  Unit? attacking;
+  Unit? attackTarget;
   late final Timer shootingTimer;
 
   bool _selected = false;
@@ -156,7 +156,7 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
 
     highlight.position = map.getBlockRenderPosition(block) - topLeftPosition;
 
-    final attacking = this.attacking;
+    final attackTarget = this.attackTarget;
     if (path.isNotEmpty) {
       final targetBlockPosition = map.getBlockCenterPosition(path.first);
       final direction = targetBlockPosition - position;
@@ -178,15 +178,15 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
         direction.scaleTo(step);
         position += direction;
       }
-    } else if (attacking != null) {
-      if (attacking.isDead) {
-        this.attacking = null;
+    } else if (attackTarget != null && attackTarget.distance(this) < 30) {
+      if (attackTarget.isDead) {
+        this.attackTarget = null;
         current = UnitAnimationState.withDirection(
           AnimationState.idle,
           angle,
         );
       } else {
-        final direction = attacking.position - position;
+        final direction = attackTarget.position - position;
         final angle = direction.angleToSigned(Vector2(1, 0));
         current = UnitAnimationState.withDirection(
           AnimationState.attack,
@@ -201,7 +201,7 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
   bool containsBlock(Block block) => this.block == block;
 
   void shoot() {
-    final enemy = attacking;
+    final enemy = attackTarget;
     if (enemy == null) {
       return;
     }
@@ -238,14 +238,11 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
   }
 
   void attack(Unit enemy) {
-    attacking = enemy;
+    attackTarget = enemy;
   }
 
-  void moveToBlock(
-    final Block targetBlock, {
-    Queue<Block>? withPath,
-  }) {
-    attacking = null; // stop attacking
+  Future<void> moveToBlock(final Block targetBlock) async {
+    attackTarget = null; // stop attacking
     final occupiedBlocks = map.occupiedBlocks;
     final currentBlock = block;
     occupiedBlocks.remove(reservedBlock);
