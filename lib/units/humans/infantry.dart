@@ -19,6 +19,15 @@ class Infantry extends Unit {
         );
 
   @override
+  void update(double dt) {
+    super.update(dt);
+    if (attackTarget != null && attackedBy.isNotEmpty) {
+      path.clear();
+      attackTarget = (attackedBy..shuffle()).first;
+    }
+  }
+
+  @override
   String get moveAsset => 'humans/infantry.fa';
 
   @override

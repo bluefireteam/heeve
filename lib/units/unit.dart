@@ -40,6 +40,7 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
   OrderedMapComponent get map => gameRef.map;
 
   Unit? attackTarget;
+  List<Unit> attackedBy = [];
   late final Timer shootingTimer;
 
   bool _selected = false;
