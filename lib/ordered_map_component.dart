@@ -161,8 +161,8 @@ class OrderedMapComponent extends IsometricTileMapComponent {
 
   Block findCloseValidBlock(Block startingBlock) {
     Block? nextBlock = startingBlock;
-    final x = startingBlock.x;
-    final y = startingBlock.y;
+    final x = startingBlock.x + rng.nextInt(1) * -rng.nextInt(1);
+    final y = startingBlock.y + rng.nextInt(1) * -rng.nextInt(1);
     var width = 1;
     var height = 1;
 

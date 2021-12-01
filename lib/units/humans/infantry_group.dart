@@ -24,7 +24,6 @@ class InfantryGroup extends Component with HasGameRef<HeeveGame> {
               1000;
         }) ||
         units.every((u) => u.isDead);
-    ;
   }
 
   @override

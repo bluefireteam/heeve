@@ -19,6 +19,7 @@ class IntroBox extends StoryBox {
   );
   late final TextBoxComponent _firstPartTextComponent;
   bool _secondPartAdded = false;
+  bool _doneSizing = true;
 
   IntroBox() : super(size: Vector2(380, 220));
 
@@ -94,7 +95,7 @@ class IntroBox extends StoryBox {
       size: Vector2(200, 40),
       anchor: Anchor.center,
       onPressed: () {
-        if (_secondPartAdded) {
+        if (_doneSizing) {
           gameRef.add(InstructionsBox());
           removeFromParent();
         }
@@ -112,7 +113,13 @@ class IntroBox extends StoryBox {
           ),
         ),
     );
-    add(SizeEffect(size: Vector2(380, 400), duration: 0.5));
+    add(
+      SizeEffect(
+        size: Vector2(380, 400),
+        duration: 0.5,
+        onComplete: () => _doneSizing = true,
+      ),
+    );
   }
 
   @override
