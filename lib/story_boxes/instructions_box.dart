@@ -66,7 +66,7 @@ class InstructionsBox extends StoryBox {
           'more insectoids.',
       textRenderer: storyStyle,
       boxConfig: TextBoxConfig(timePerChar: 0.08, maxWidth: 280),
-      position: Vector2(size.x / 2 + 20, 170),
+      position: Vector2(size.x / 2 + 20, 220),
       anchor: Anchor.center,
     );
 
