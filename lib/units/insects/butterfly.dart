@@ -4,11 +4,11 @@ import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flame/geometry.dart';
 import 'package:flutter/animation.dart';
-import 'package:heeve/units/insects/worker.dart';
 
 import '../../has_block.dart';
 import '../../heeve_game.dart';
 import '../../ordered_map_component.dart';
+import 'worker.dart';
 
 class Butterfly extends SpriteAnimationComponent
     with HasGameRef<HeeveGame>, HasHitboxes, Collidable, HasBlock {

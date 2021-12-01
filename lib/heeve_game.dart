@@ -8,7 +8,6 @@ import 'package:flame/sprite.dart';
 import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:heeve/units/insects/worker.dart';
 
 import 'button_component.dart';
 import 'map_generator.dart';
@@ -19,6 +18,7 @@ import 'units/building.dart';
 import 'units/humans/spaceship.dart';
 import 'units/insects/butterfly.dart';
 import 'units/insects/ore.dart';
+import 'units/insects/worker.dart';
 import 'units/unit.dart';
 
 class HeeveGame extends FlameGame
@@ -233,17 +233,17 @@ class HeeveGame extends FlameGame
   void onMouseMove(PointerHoverInfo details) {
     final mousePosition = details.eventPosition.global;
     final windowSize = camera.viewport.canvasSize!;
-    //if (mousePosition.x <= movementBoundaries) {
-    //  cameraDirection.setValues(-1, 0);
-    //} else if (mousePosition.y <= movementBoundaries) {
-    //  cameraDirection.setValues(0, -1);
-    //} else if (mousePosition.x >= windowSize.x - movementBoundaries) {
-    //  cameraDirection.setValues(1, 0);
-    //} else if (mousePosition.y >= windowSize.y - movementBoundaries) {
-    //  cameraDirection.setValues(0, 1);
-    //} else {
-    //  cameraDirection.setValues(0, 0);
-    //}
+    if (mousePosition.x <= movementBoundaries) {
+      cameraDirection.setValues(-1, 0);
+    } else if (mousePosition.y <= movementBoundaries) {
+      cameraDirection.setValues(0, -1);
+    } else if (mousePosition.x >= windowSize.x - movementBoundaries) {
+      cameraDirection.setValues(1, 0);
+    } else if (mousePosition.y >= windowSize.y - movementBoundaries) {
+      cameraDirection.setValues(0, 1);
+    } else {
+      cameraDirection.setValues(0, 0);
+    }
 
     final building = buildingComponent;
     if (building != null) {

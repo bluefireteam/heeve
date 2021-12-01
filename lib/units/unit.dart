@@ -279,13 +279,13 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
   Future<void> moveToBlock(final Block targetBlock) async {
     attackTarget = null; // stop attacking
     final occupiedBlocks = map.occupiedBlocks;
-    final currentBlock = block;
     occupiedBlocks.remove(reservedBlock);
     target = reservedBlock = map.findCloseValidBlock(targetBlock);
     occupiedBlocks.add(reservedBlock!);
 
     // TODO: Optimize so that not all units in a group have to re-run this
-    //_generatePath(
+    //final currentBlock = block;
+    //generatePath(
     //  currentBlock,
     //  target!,
     //  map.matrix,
@@ -296,7 +296,7 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
       ..addFirst(target!);
   }
 
-  Future<Queue<Block>> _generatePath(
+  Future<Queue<Block>> generatePath(
     Block startingBlock,
     Block target,
     List<List<int>> matrix,
