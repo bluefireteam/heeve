@@ -10,6 +10,7 @@ import 'units/insects/butterfly.dart';
 class CurrencyComponent extends TextComponent {
   late final SpriteAnimationComponent currencyIndicator;
   static const double _defaultFontSize = 16;
+  static const double iconWidth = 20;
   final double fontSize;
 
   CurrencyComponent({
@@ -38,6 +39,7 @@ class CurrencyComponent extends TextComponent {
     final scale = fontSize / _defaultFontSize;
     currencyIndicator = Butterfly(
       position: Vector2(-12 * scale, 9 * scale),
+      size: Vector2.all(iconWidth),
       playing: false,
       loop: false,
     );

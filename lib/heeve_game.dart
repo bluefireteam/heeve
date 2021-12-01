@@ -14,10 +14,7 @@ import 'map_generator.dart';
 import 'ordered_map_component.dart';
 import 'selector.dart';
 import 'side_bar.dart';
-import 'story_boxes/start_box.dart';
 import 'units/building.dart';
-import 'units/humans/infantry.dart';
-import 'units/humans/infantry_group.dart';
 import 'units/insects/butterfly.dart';
 import 'units/insects/ore.dart';
 import 'units/insects/worker.dart';
@@ -61,7 +58,8 @@ class HeeveGame extends FlameGame
     camera.speed = 5000;
     camera.viewport = FixedResolutionViewport(Vector2(800, 600));
 
-    add(StartBox());
+    //add(StartBox()); // TODO(spydon): swap these later
+    add(SideBar());
     tileset = SpriteSheet(
       image: await images.load('tileset.png'),
       srcSize: Vector2.all(32.0),
@@ -71,16 +69,16 @@ class HeeveGame extends FlameGame
     await add(map = OrderedMapComponent(tileset, matrix, tileHeight: 8));
     centerMap();
 
-    final infantryGroups = List.generate(
-      3,
-      (_) => InfantryGroup(List.generate(5, (_) => Infantry())),
-    );
-    infantryGroups.forEach(
-      (group) =>
-          group.units.forEach((u) => map.addOnBlock(u, map.randomBlock())),
-    );
+    //final infantryGroups = List.generate(
+    //  3,
+    //  (_) => InfantryGroup(List.generate(5, (_) => Infantry())),
+    //);
+    //infantryGroups.forEach(
+    //  (group) =>
+    //      group.units.forEach((u) => map.addOnBlock(u, map.randomBlock())),
+    //);
 
-    addAll(infantryGroups);
+    //addAll(infantryGroups);
     map.addOnBlock(Worker(), const Block(2, 2));
     map.addOnBlock(Ore(), map.randomBlock());
     map.addOnBlock(Ore(), map.randomBlock());
@@ -241,17 +239,17 @@ class HeeveGame extends FlameGame
   void onMouseMove(PointerHoverInfo details) {
     final mousePosition = details.eventPosition.global;
     final windowSize = camera.viewport.canvasSize!;
-    if (mousePosition.x <= movementBoundaries) {
-      cameraDirection.setValues(-1, 0);
-    } else if (mousePosition.y <= movementBoundaries) {
-      cameraDirection.setValues(0, -1);
-    } else if (mousePosition.x >= windowSize.x - movementBoundaries) {
-      cameraDirection.setValues(1, 0);
-    } else if (mousePosition.y >= windowSize.y - movementBoundaries) {
-      cameraDirection.setValues(0, 1);
-    } else {
-      cameraDirection.setValues(0, 0);
-    }
+    //if (mousePosition.x <= movementBoundaries) {
+    //  cameraDirection.setValues(-1, 0);
+    //} else if (mousePosition.y <= movementBoundaries) {
+    //  cameraDirection.setValues(0, -1);
+    //} else if (mousePosition.x >= windowSize.x - movementBoundaries) {
+    //  cameraDirection.setValues(1, 0);
+    //} else if (mousePosition.y >= windowSize.y - movementBoundaries) {
+    //  cameraDirection.setValues(0, 1);
+    //} else {
+    //  cameraDirection.setValues(0, 0);
+    //}
 
     final building = buildingComponent;
     if (building != null) {

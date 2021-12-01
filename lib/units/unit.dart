@@ -7,6 +7,8 @@ import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame_fire_atlas/flame_fire_atlas.dart';
+import 'package:heeve/block_extension.dart';
+import 'package:heeve/offset_extension.dart';
 
 import '../heeve_game.dart';
 import '../highlight.dart';
@@ -143,6 +145,7 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
 
   @override
   void update(double dt) {
+    super.update(dt);
     if (isDead) {
       animation?.update(dt);
       if (animation?.done() != false) {
@@ -150,8 +153,6 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
       }
       return;
     }
-
-    super.update(dt);
 
     highlight.position = map.getBlockRenderPosition(block) - topLeftPosition;
 
@@ -170,7 +171,9 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
       if (direction.length < step) {
         position = targetBlockPosition;
         path.removeFirst();
-        current = current?.copyWithState(AnimationState.idle);
+        if (path.isEmpty) {
+          current = current?.copyWithState(AnimationState.idle);
+        }
       } else {
         direction.scaleTo(step);
         position += direction;
@@ -263,24 +266,21 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
     List<List<int>> matrix,
     Set<Block> occupiedBlocks,
   ) async {
-    final path = Queue<Block>();
     final offsetPath = await Future(
       AStar(
-        rows: matrix.length,
-        columns: matrix.first.length,
-        start: Offset(
-          startingBlock.x.toDouble(),
-          startingBlock.y.toDouble(),
-        ),
-        end: Offset(target.x.toDouble(), target.y.toDouble()),
-        barriers: occupiedBlocks
-            .map((b) => Offset(b.x.toDouble(), b.y.toDouble()))
-            .toList(growable: false),
-        //withDiagonal: false,
+        rows: map.maxX,
+        columns: map.maxY,
+        start: startingBlock.toOffset(),
+        end: target.toOffset(),
+        barriers: occupiedBlocks.map((b) => b.toOffset()).toList()
+          ..removeWhere(
+            (o) => o == target.toOffset() || o == startingBlock.toOffset(),
+          ),
       ).findThePath,
     );
-    offsetPath.forEach((o) => path.addFirst(Block(o.dx.toInt(), o.dy.toInt())));
-    path.add(target);
+    final path = Queue<Block>();
+    offsetPath.forEach((o) => path.addFirst(o.toBlock()));
+    path.addLast(target);
     return path;
   }
 

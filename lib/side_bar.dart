@@ -42,15 +42,15 @@ class SideBar extends NineTileBoxComponent with HasGameRef<HeeveGame> {
         gameRef.tileset,
         gameRef.matrix,
         tileHeight: 8,
-        destTileSize: Vector2(10, 10),
-        position: Vector2(size.x / 2 + 10, 20),
+        destTileSize: Vector2(8, 8),
+        position: Vector2(size.x / 2, 30),
       ),
     );
 
     await add(
       currencyComponent = CurrencyComponent(
         value: gameRef.currencyNotifier.value,
-        position: Vector2(barWidth / 2, 120),
+        position: Vector2(barWidth / 2 + CurrencyComponent.iconWidth / 2, 140),
       ),
     );
 
