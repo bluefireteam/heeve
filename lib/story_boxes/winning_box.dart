@@ -59,12 +59,12 @@ class WinningBox extends StoryBox {
 
     final instructionsText = TextBoxComponent(
       text: 'You managed to fight off the humans and you and your kind can now '
-          'live in harmony on your planet. (Until the next time that they '
-          'arrive, but by then you will be prepared with more buildings and '
+          'live in harmony on your planet. (Until the next time they arrive, '
+          'but by then you will be prepared with more buildings and '
           'more types of insectiods.)',
       textRenderer: storyStyle,
       boxConfig: TextBoxConfig(timePerChar: 0.08, maxWidth: 280),
-      position: Vector2(size.x / 2 + 20, 170),
+      position: Vector2(size.x / 2 + 25, 170),
       anchor: Anchor.center,
     );
 

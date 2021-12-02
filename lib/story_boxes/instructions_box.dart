@@ -59,11 +59,11 @@ class InstructionsBox extends StoryBox {
     );
 
     final instructionsText = TextBoxComponent(
-      text: 'Gather butterflies (your food) by attacking the mines and kill '
-          'the humans and their ships by right clicking on them (when you are '
-          'close enough). Select insectoids by dragging or left click on them. '
-          'Build hatcheries by collecting enough butterflies, they will spawn '
-          'more insectoids.',
+      text: 'Select insectoids by dragging or left click on them, move and '
+          'attack with right click. Gather butterflies (your food) by attacking '
+          'the mines and kill the humans and their ships by right clicking on '
+          'them. Build hatcheries for 10 butterflies, they will spawn more '
+          'insectoids.',
       textRenderer: storyStyle,
       boxConfig: TextBoxConfig(timePerChar: 0.08, maxWidth: 280),
       position: Vector2(size.x / 2 + 20, 220),
