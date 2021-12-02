@@ -35,10 +35,11 @@ class Projectile extends PositionComponent {
 
   @override
   void update(double dt) {
-    if (target.isDead) {
-      removeFromParent();
-    }
     super.update(dt);
+    if (target.isDead || target.shouldRemove || target.parent == null) {
+      removeFromParent();
+      return;
+    }
 
     final targetPosition = target.bulletPosition;
     final direction = targetPosition - position;

@@ -159,10 +159,10 @@ class OrderedMapComponent extends IsometricTileMapComponent {
     }
   }
 
-  Block findCloseValidBlock(Block startingBlock) {
+  Block findCloseValidBlock(Block startingBlock, {bool random = false}) {
     Block? nextBlock = startingBlock;
-    final x = startingBlock.x + rng.nextInt(1) * -rng.nextInt(1);
-    final y = startingBlock.y + rng.nextInt(1) * -rng.nextInt(1);
+    final x = startingBlock.x;
+    final y = startingBlock.y;
     var width = 1;
     var height = 1;
 
@@ -171,10 +171,14 @@ class OrderedMapComponent extends IsometricTileMapComponent {
       final bottomRight = Block(x + width, y + height);
       final topRight = Block(bottomRight.x, topLeft.y);
       final bottomLeft = Block(topLeft.x, bottomRight.y);
-      final blocks = _blocksBetween(topLeft, topRight)
-        ..addAll(_blocksBetween(topRight, bottomRight))
-        ..addAll(_blocksBetween(bottomRight, bottomLeft))
-        ..addAll(_blocksBetween(bottomLeft, topLeft));
+      final blocks = (_blocksBetween(bottomRight, bottomLeft)
+            ..addAll(_blocksBetween(bottomLeft, topLeft))
+            ..addAll(_blocksBetween(topRight, bottomRight))
+            ..addAll(_blocksBetween(topLeft, topRight)))
+          .toList(growable: false);
+      if (random) {
+        blocks.shuffle(rng);
+      }
       nextBlock = blocks.firstWhereOrNull(validBlock);
       width++;
       height++;

@@ -28,7 +28,13 @@ class Hatchery extends Building {
     super.update(dt);
     if (timeSinceSpawn > spawnRate &&
         gameRef.map.children.query<Worker>().length < maxPopulation) {
-      gameRef.map.addOnBlock(Worker(), map.findCloseValidBlock(block));
+      gameRef.map.addOnBlock(
+        Worker(),
+        map.findCloseValidBlock(
+          block,
+          random: true,
+        ),
+      );
       timeSinceSpawn = 0;
     }
   }

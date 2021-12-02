@@ -1,8 +1,10 @@
 import 'package:flame/components.dart';
+import 'package:flame/geometry.dart';
 
+import '../insects/worker.dart';
 import '../unit.dart';
 
-class Infantry extends Unit {
+class Infantry extends Unit with HasHitboxes, Collidable {
   static const int infantryHp = 100;
   static const int infantrySpeed = 50;
 
@@ -19,11 +21,24 @@ class Infantry extends Unit {
         );
 
   @override
+  Future<void> onLoad() async {
+    await super.onLoad();
+    addHitbox(HitboxCircle(normalizedRadius: 0.5));
+  }
+
+  @override
   void update(double dt) {
     super.update(dt);
     if (attackTarget == null && attackedBy.isNotEmpty) {
       path.clear();
       attackTarget = (attackedBy..shuffle()).first;
+    }
+  }
+
+  @override
+  void onCollisionEnd(Collidable other) {
+    if (other is Worker && !other.isDead) {
+      attack(other);
     }
   }
 

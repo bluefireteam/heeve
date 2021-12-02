@@ -49,24 +49,31 @@ class ButtonComponent extends SpriteGroupComponent<ButtonState> {
     super.onMount();
   }
 
+  bool _isPressed = false;
+
   @mustCallSuper
   bool onTapDown() {
     current = ButtonState.down;
     children.query<PositionComponent>().forEach((c) => c.position.y += 6);
+    _isPressed = true;
     return false;
   }
 
   @mustCallSuper
   bool onTapUp() {
-    onPressed?.call();
-    onTapCancel();
+    if (_isPressed) {
+      onPressed?.call();
+      onTapCancel();
+    }
     return false;
   }
 
   @mustCallSuper
   bool onTapCancel() {
-    current = ButtonState.up;
-    children.query<PositionComponent>().forEach((c) => c.position.y -= 6);
+    if (_isPressed) {
+      current = ButtonState.up;
+      children.query<PositionComponent>().forEach((c) => c.position.y -= 6);
+    }
     return false;
   }
 }

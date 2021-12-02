@@ -4,7 +4,7 @@ import 'package:flame/geometry.dart';
 import '../unit.dart';
 
 class Worker extends Unit with HasHitboxes, Collidable {
-  static const int workerHp = 10;
+  static const int workerHp = 15;
   static const int workerSpeed = 60;
 
   Worker({

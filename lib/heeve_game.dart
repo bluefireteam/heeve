@@ -28,7 +28,6 @@ import 'units/unit.dart';
 class HeeveGame extends FlameGame
     with
         MouseMovementDetector,
-        ScrollDetector,
         TapDetector,
         SecondaryTapDetector,
         PanDetector,
@@ -99,18 +98,19 @@ class HeeveGame extends FlameGame
   @override
   void update(double dt) {
     super.update(dt);
+    tappableButtons.removeWhere((b) => b.parent == null);
 
     if (hasWon && !hasShownEndBox) {
       add(WinningBox());
       hasShownEndBox = true;
       return;
-    } else if (hasLost) {
+    } else if (hasLost && !hasShownEndBox) {
       add(LosingBox());
       hasShownEndBox = true;
       return;
     }
 
-    if (!FlameAudio.bgm.isPlaying) {
+    if (!FlameAudio.bgm.isPlaying && hasStarted) {
       final songs = ['intro.mp3', 'battle.mp3', 'sci-fi.mp3']..shuffle();
       FlameAudio.bgm.play(songs.first);
     }
@@ -121,7 +121,7 @@ class HeeveGame extends FlameGame
 
   void centerMap() {
     camera.snapTo(
-      (map.position - size / 2 + canvasSize / 10)..x -= SideBar.barWidth,
+      (map.position - size / 2 + canvasSize / 8)..x -= SideBar.barWidth * 0.5,
     );
   }
 
@@ -275,14 +275,6 @@ class HeeveGame extends FlameGame
       building.position = details.eventPosition.game;
       map.getBlock(building.topLeftPosition);
     }
-  }
-
-  @override
-  void onScroll(PointerScrollInfo event) {
-    final zooms = [0.25, 0.5, 1.0, 2.0, 4.0, 10.0];
-    final idx =
-        zooms.indexOf(camera.zoom) - event.scrollDelta.game.y.sign.toInt();
-    camera.zoom = zooms[idx % zooms.length];
   }
 
   @override

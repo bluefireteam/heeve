@@ -42,7 +42,13 @@ class Ore extends Building {
         timeSinceSpawn > spawnRate &&
         map.children.query<Butterfly>().length < maxPopulation) {
       timeSinceSpawn = 0;
-      map.addOnBlock(Butterfly(), map.findCloseValidBlock(block));
+      map.addOnBlock(
+        Butterfly(),
+        map.findCloseValidBlock(
+          block,
+          random: true,
+        ),
+      );
     }
   }
 }

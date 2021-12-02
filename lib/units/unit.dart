@@ -207,7 +207,7 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
         position += direction;
       }
     } else if (attackTarget != null) {
-      if (attackTarget.isDead) {
+      if (attackTarget.isDead || distance(attackTarget) > 100) {
         this.attackTarget = null;
         current = UnitAnimationState.withDirection(
           AnimationState.idle,
@@ -256,7 +256,7 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
           SizeEffect(
             size: Vector2.zero(),
             duration: 1,
-            onComplete: removeFromParent,
+            onComplete: () => map.removeUnit(this),
           ),
         );
       }
@@ -268,16 +268,12 @@ abstract class Unit extends SpriteAnimationGroupComponent<UnitAnimationState>
     if (enemy.distance(this) < 100) {
       attackTarget = enemy;
       path.clear();
+      if (map.getBlockCenterPosition(block) != position) {
+        moveToBlock(block);
+      }
       enemy.attackedBy.add(this);
-      enemy.path.clear();
     } else {
-      add(
-        RotateEffect(
-          angle: 0.5,
-          duration: 0.2,
-          isAlternating: true,
-        ),
-      );
+      moveToBlock(enemy.block);
     }
   }
 
